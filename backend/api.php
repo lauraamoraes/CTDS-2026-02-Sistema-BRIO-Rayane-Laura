@@ -7,6 +7,31 @@ require_once __DIR__ . '/config/auth.php';
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
+function requirePlanoPago($pdo, $uid)
+{
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*)
+         FROM usuarios u
+         INNER JOIN planos p
+            ON p.id = u.plano_atual_id
+         INNER JOIN assinaturas a
+            ON a.usuario_id = u.id
+            AND a.plano_id = p.id
+         WHERE u.id = ?
+         AND p.valor_mensal > 0
+         AND a.status = 'ativa'
+         AND a.fim >= CURDATE()"
+    );
+
+    $stmt->execute([$uid]);
+
+    if ((int)$stmt->fetchColumn() === 0) {
+        jsonResponse([
+            'erro' => 'Essa funcionalidade está disponível apenas nos planos pagos.'
+        ], 403);
+    }
+}
+
 try {
 
     /*
@@ -18,12 +43,212 @@ try {
 
 
     switch ($action) {
+        
+case 'register_professor':
 
+    if ($method !== 'POST') {
+        jsonResponse(['erro' => 'Método inválido.'], 405);
+    }
+
+    // O cadastro do professor recebe multipart/form-data,
+    // não JSON, porque inclui um arquivo.
+    $nome = trim($_POST['nome'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $senha = $_POST['senha'] ?? '';
+    $confirmar = $_POST['confirmar_senha'] ?? '';
+
+    if (
+        mb_strlen($nome) < 3 ||
+        !filter_var($email, FILTER_VALIDATE_EMAIL) ||
+        strlen($senha) < 8
+    ) {
+        jsonResponse([
+            'erro' => 'Informe nome, e-mail válido e senha de pelo menos 8 caracteres.'
+        ], 422);
+    }
+
+    if ($senha !== $confirmar) {
+        jsonResponse(['erro' => 'As senhas não coincidem.'], 422);
+    }
+
+    if (
+        !isset($_FILES['diploma']) ||
+        $_FILES['diploma']['error'] !== UPLOAD_ERR_OK
+    ) {
+        jsonResponse(['erro' => 'Envie seu diploma.'], 422);
+    }
+
+    $arquivo = $_FILES['diploma'];
+
+    if ($arquivo['size'] > 5 * 1024 * 1024) {
+        jsonResponse(['erro' => 'O diploma deve ter no máximo 5 MB.'], 422);
+    }
+
+    // Confere o tipo real do arquivo.
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($arquivo['tmp_name']);
+
+    $tiposPermitidos = [
+        'application/pdf' => 'pdf',
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png'
+    ];
+
+    if (!isset($tiposPermitidos[$mime])) {
+        jsonResponse([
+            'erro' => 'Formato inválido. Envie PDF, JPG ou PNG.'
+        ], 422);
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT id FROM usuarios WHERE email = ?'
+    );
+    $stmt->execute([$email]);
+
+    if ($stmt->fetch()) {
+        jsonResponse(['erro' => 'Este e-mail já está cadastrado.'], 409);
+    }
+
+    // Guarde os documentos fora da pasta pública frontend.
+    $diretorio = dirname(__DIR__) . '/documentos_privados/professores/';
+
+    if (!is_dir($diretorio) &&
+        !mkdir($diretorio, 0700, true) &&
+        !is_dir($diretorio)) {
+        jsonResponse(['erro' => 'Não foi possível preparar o armazenamento.'], 500);
+    }
+
+    $nomeArquivo = bin2hex(random_bytes(16))
+        . '.' . $tiposPermitidos[$mime];
+
+    $caminho = $diretorio . $nomeArquivo;
+
+    if (!move_uploaded_file($arquivo['tmp_name'], $caminho)) {
+        jsonResponse(['erro' => 'Não foi possível salvar o diploma.'], 500);
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // Mantém o hash SHA-256 usado pelo login atual.
+        // Posteriormente, recomendamos migrar para password_hash().
+        $hash = hash('sha256', $senha);
+
+       // 1. Cadastra o professor na tabela de usuários
+$stmt = $pdo->prepare("
+    INSERT INTO usuarios
+        (nome, email, senha, tipo, objetivo)
+    VALUES
+        (?, ?, ?, 'professor', ?)
+");
+
+$stmt->execute([
+    $nome,
+    $email,
+    $hash,
+    ''
+]);
+
+// 2. Recupera o ID do professor cadastrado
+$usuarioId = (int)$pdo->lastInsertId();
+
+// 3. Salva o diploma com aprovação automática
+$stmt = $pdo->prepare("
+    INSERT INTO documentos_professores
+        (usuario_id, diploma_arquivo, status)
+    VALUES
+        (?, ?, 'aprovado')
+");
+
+$stmt->execute([
+    $usuarioId,
+    $nomeArquivo
+]);
+
+        
+$pdo->commit();
+
+// Inicia a sessão do professor automaticamente.
+session_regenerate_id(true);
+
+$_SESSION['usuario_id'] = $usuarioId;
+$_SESSION['usuario_nome'] = $nome;
+$_SESSION['usuario_tipo'] = 'professor';
+
+jsonResponse([
+    'ok' => true,
+    'mensagem' => 'Cadastro realizado com sucesso!',
+    'usuario' => [
+        'id' => $usuarioId,
+        'nome' => $nome,
+        'tipo' => 'professor'
+    ]
+], 201);
+
+
+    } catch (Throwable $erro) {
+
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        if (is_file($caminho)) {
+            unlink($caminho);
+        }
+
+        jsonResponse([
+            'erro' => 'Não foi possível concluir o cadastro.'
+        ], 500);
+    }
+
+    break;
+
+        case 'verificar_plano':
+
+    $uid = requireLogin();
+
+    $stmt = $pdo->prepare(
+        "SELECT
+            p.nome,
+            p.valor_mensal,
+            a.status,
+            a.fim
+
+         FROM usuarios u
+
+         LEFT JOIN planos p
+            ON p.id = u.plano_atual_id
+
+         LEFT JOIN assinaturas a
+            ON a.usuario_id = u.id
+            AND a.plano_id = p.id
+            AND a.status = 'ativa'
+            AND a.fim >= CURDATE()
+
+         WHERE u.id = ?"
+    );
+
+    $stmt->execute([$uid]);
+
+    $plano = $stmt->fetch();
+
+    $pago = (
+        $plano &&
+        $plano['status'] === 'ativa' &&
+        (float)$plano['valor_mensal'] > 0
+    );
+
+    jsonResponse([
+        'pago' => $pago,
+        'plano' => $plano['nome'] ?? 'Gratuito'
+    ]);
+
+    break;
 
         /* =========================
            CADASTRO
         ========================= */
-
+        
         case 'register':
 
             if ($method !== 'POST') {
@@ -168,6 +393,9 @@ try {
                         'E-mail ou senha incorretos.'
                 ], 401);
             }
+            
+
+
 
 
             $_SESSION['usuario_id'] =
@@ -204,13 +432,30 @@ try {
 
         case 'logout':
 
-            session_destroy();
+    $_SESSION = [];
 
-            jsonResponse([
-                'ok' => true
-            ]);
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
 
-            break;
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $params['path'],
+            $params['domain'],
+            $params['secure'],
+            $params['httponly']
+        );
+    }
+
+    session_destroy();
+
+    jsonResponse([
+        'ok' => true,
+        'mensagem' => 'Logout realizado com sucesso.'
+    ]);
+
+    break;
 
 
         /* =========================
@@ -437,219 +682,314 @@ try {
 
         case 'progresso':
 
-            $uid =
-                requireLogin();
-
+            $uid = requireLogin();
 
             if ($method !== 'POST') {
-
-                jsonResponse([
-                    'erro' =>
-                        'Método inválido.'
-                ], 405);
+                jsonResponse(['erro' => 'Método inválido.'], 405);
             }
 
+            $d = body();
+            $conteudo = (int)($d['conteudo_id'] ?? 0);
+            $percentual = min(100, max(0, (int)($d['percentual'] ?? 0)));
 
-            $d =
-                body();
-
-
-            $conteudo =
-                (int)(
-                    $d['conteudo_id'] ?? 0
-                );
-
-
-            $percentual =
-                min(
-                    100,
-                    max(
-                        0,
-                        (int)(
-                            $d['percentual'] ?? 0
-                        )
-                    )
-                );
-
-
-            $concluido =
-                $percentual >= 100
-                    ? 1
-                    : 0;
-
-
-            $stmt =
-                $pdo->prepare(
-                    "INSERT INTO progresso_conteudos
-                    (
-                        usuario_id,
-                        conteudo_id,
-                        percentual,
-                        concluido
-                    )
-                    VALUES (?, ?, ?, ?)
-
-                    ON DUPLICATE KEY UPDATE
-                        percentual = VALUES(percentual),
-                        concluido = VALUES(concluido)"
-                );
-
-
-            $stmt->execute([
-                $uid,
-                $conteudo,
-                $percentual,
-                $concluido
-            ]);
-
-
-            if ($concluido) {
-
-                $stmt =
-                    $pdo->prepare(
-                        "INSERT INTO pontuacoes
-                        (
-                            usuario_id,
-                            quantidade,
-                            motivo
-                        )
-                        VALUES (?, 10, 'Conteúdo concluído')"
-                    );
-
-                $stmt->execute([
-                    $uid
-                ]);
+            if ($conteudo <= 0) {
+                jsonResponse(['erro' => 'Conteúdo inválido.'], 422);
             }
 
+            $stmt = $pdo->prepare(
+                "SELECT concluido FROM progresso_conteudos
+                 WHERE usuario_id = ? AND conteudo_id = ?"
+            );
+            $stmt->execute([$uid, $conteudo]);
+            $anterior = $stmt->fetch();
+
+            $jaConcluido = $anterior && (int)$anterior['concluido'] === 1;
+            $concluido = $percentual >= 100 ? 1 : 0;
+
+            $stmt = $pdo->prepare(
+                "INSERT INTO progresso_conteudos
+                (usuario_id, conteudo_id, percentual, concluido)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    percentual = VALUES(percentual),
+                    concluido = VALUES(concluido)"
+            );
+            $stmt->execute([$uid, $conteudo, $percentual, $concluido]);
+
+            if ($concluido && !$jaConcluido) {
+                $stmt = $pdo->prepare(
+                    "INSERT INTO pontuacoes (usuario_id, quantidade, motivo)
+                     VALUES (?, 10, 'Conteúdo concluído')"
+                );
+                $stmt->execute([$uid]);
+            }
 
             jsonResponse([
-                'ok' => true
+                'ok' => true,
+                'salvo' => true,
+                'concluido' => $concluido
             ]);
 
             break;
 
 
         /* =========================
+           DADOS DO PROGRESSO
+        ========================= */
+
+        case 'progresso_dados':
+
+            $uid = requireLogin();
+            requirePlanoPago($pdo, $uid);
+
+            $stmt = $pdo->prepare(
+                "SELECT COALESCE(SUM(quantidade), 0) AS xp
+                 FROM pontuacoes WHERE usuario_id = ?"
+            );
+            $stmt->execute([$uid]);
+            $xp = (int)$stmt->fetch()['xp'];
+
+            $nivel = max(1, (int)floor($xp / 250) + 1);
+
+            $stmt = $pdo->prepare(
+                "SELECT COUNT(*) AS total FROM progresso_conteudos
+                 WHERE usuario_id = ? AND concluido = 1"
+            );
+            $stmt->execute([$uid]);
+            $conteudos = (int)$stmt->fetch()['total'];
+
+            $stmt = $pdo->prepare(
+                "SELECT COUNT(*) AS total FROM tentativas WHERE usuario_id = ?"
+            );
+            $stmt->execute([$uid]);
+            $simulados = (int)$stmt->fetch()['total'];
+
+            $stmt = $pdo->prepare(
+                "SELECT COUNT(*) AS total FROM redacoes WHERE usuario_id = ?"
+            );
+            $stmt->execute([$uid]);
+            $redacoes = (int)$stmt->fetch()['total'];
+
+            $stmt = $pdo->prepare(
+                "SELECT COUNT(*) AS total FROM tarefas
+                 WHERE usuario_id = ? AND status = 'concluida'"
+            );
+            $stmt->execute([$uid]);
+            $tarefas = (int)$stmt->fetch()['total'];
+
+            $atividades = $conteudos + $simulados + $redacoes + $tarefas;
+
+            $stmt = $pdo->prepare(
+                "SELECT DISTINCT DATE(data) AS dia
+                 FROM pontuacoes WHERE usuario_id = ? ORDER BY dia DESC"
+            );
+            $stmt->execute([$uid]);
+            $dias = $stmt->fetchAll();
+
+            $sequencia = 0;
+            $ultimaData = null;
+            $hoje = new DateTime(date('Y-m-d'));
+
+            foreach ($dias as $linha) {
+                $dia = new DateTime($linha['dia']);
+
+                if ($ultimaData === null) {
+                    $diferencaHoje = (int)$hoje->diff($dia)->days;
+                    if ($diferencaHoje > 1) break;
+                } else {
+                    $diferenca = (int)$ultimaData->diff($dia)->days;
+                    if ($diferenca !== 1) break;
+                }
+
+                $sequencia++;
+                $ultimaData = $dia;
+            }
+
+            $conquistasBase = [
+                ['Primeiro passo', 'Concluiu seu primeiro conteúdo.', 20],
+                ['Primeiro simulado', 'Finalizou seu primeiro simulado.', 30],
+                ['Uma semana', 'Manteve uma sequência de 7 dias.', 50],
+                ['500 XP', 'Alcançou 500 XP.', 100],
+                ['Foco total', 'Realizou 10 atividades.', 100],
+                ['Próximo nível', 'Alcançou o nível 2.', 100],
+                ['1000 XP', 'Alcançou 1000 XP.', 200],
+                ['Mestre BRIO', 'Concluiu grandes metas na plataforma.', 500]
+            ];
+
+            foreach ($conquistasBase as $conquista) {
+                $stmt = $pdo->prepare(
+                    "SELECT id FROM conquistas WHERE nome = ? LIMIT 1"
+                );
+                $stmt->execute([$conquista[0]]);
+
+                if (!$stmt->fetch()) {
+                    $stmt = $pdo->prepare(
+                        "INSERT INTO conquistas (nome, descricao, xp)
+                         VALUES (?, ?, ?)"
+                    );
+                    $stmt->execute($conquista);
+                }
+            }
+
+            $regras = [
+                'Primeiro passo' => $conteudos >= 1,
+                'Primeiro simulado' => $simulados >= 1,
+                'Uma semana' => $sequencia >= 7,
+                '500 XP' => $xp >= 500,
+                'Foco total' => $atividades >= 10,
+                'Próximo nível' => $nivel >= 2,
+                '1000 XP' => $xp >= 1000,
+                'Mestre BRIO' => (
+                    $xp >= 1000 &&
+                    $conteudos >= 20 &&
+                    $simulados >= 10 &&
+                    $redacoes >= 5 &&
+                    $tarefas >= 30
+                )
+            ];
+
+            foreach ($regras as $nome => $desbloqueada) {
+                if (!$desbloqueada) continue;
+
+                $stmt = $pdo->prepare(
+                    "SELECT id FROM conquistas WHERE nome = ? LIMIT 1"
+                );
+                $stmt->execute([$nome]);
+                $conquista = $stmt->fetch();
+
+                if ($conquista) {
+                    $stmt = $pdo->prepare(
+                        "INSERT IGNORE INTO usuario_conquistas
+                         (usuario_id, conquista_id) VALUES (?, ?)"
+                    );
+                    $stmt->execute([$uid, $conquista['id']]);
+                }
+            }
+
+            $stmt = $pdo->prepare(
+                "SELECT c.id, c.nome, c.descricao, c.xp,
+                        CASE WHEN uc.id IS NOT NULL THEN 1 ELSE 0 END AS desbloqueada
+                 FROM conquistas c
+                 LEFT JOIN usuario_conquistas uc
+                    ON uc.conquista_id = c.id AND uc.usuario_id = ?
+                 WHERE c.nome IN
+                 ('Primeiro passo','Primeiro simulado','Uma semana','500 XP',
+                  'Foco total','Próximo nível','1000 XP','Mestre BRIO')
+                 ORDER BY FIELD(c.nome,
+                  'Primeiro passo','Primeiro simulado','Uma semana','500 XP',
+                  'Foco total','Próximo nível','1000 XP','Mestre BRIO')"
+            );
+            $stmt->execute([$uid]);
+            $conquistas = $stmt->fetchAll();
+
+            jsonResponse([
+                'xp' => $xp,
+                'nivel' => $nivel,
+                'conteudos' => $conteudos,
+                'simulados' => $simulados,
+                'redacoes' => $redacoes,
+                'tarefas' => $tarefas,
+                'sequencia' => $sequencia,
+                'atividades' => $atividades,
+                'conquistas' => $conquistas
+            ]);
+
+            break;
+
+        /* =========================
            SIMULADOS
         ========================= */
 
-        case 'simulados':
+        
+case 'simulados':
 
-            requireLogin();
+    requireLogin();
 
+    $sql = "
+        SELECT
+            s.*,
+            COALESCE(m.nome, 'Geral') AS materia,
+            COUNT(q.id) AS questoes
 
-            $sql = "
-                SELECT
-                    s.*,
-                    m.nome AS materia,
-                    COUNT(q.id) AS questoes
+        FROM simulados s
 
-                FROM simulados s
+        LEFT JOIN materias m
+            ON m.id = s.materia_id
 
-                JOIN materias m
-                    ON m.id = s.materia_id
+        LEFT JOIN questoes q
+            ON q.simulado_id = s.id
 
-                LEFT JOIN questoes q
-                    ON q.simulado_id = s.id
+        GROUP BY s.id
 
-                GROUP BY s.id
+        ORDER BY s.id DESC
+    ";
 
-                ORDER BY s.id DESC
-            ";
+    $resultado = $pdo->query($sql);
 
+    jsonResponse($resultado->fetchAll());
 
-            $resultado =
-                $pdo->query($sql);
-
-
-            jsonResponse(
-                $resultado->fetchAll()
-            );
-
-            break;
+    break;
 
 
         /* =========================
            SIMULADO INDIVIDUAL
         ========================= */
 
-        case 'simulado':
+        
+case 'simulado':
 
-            requireLogin();
+    requireLogin();
 
+    $id = (int)($_GET['id'] ?? 0);
 
-            $id =
-                (int)(
-                    $_GET['id'] ?? 0
-                );
+    $stmt = $pdo->prepare("
+        SELECT
+            s.*,
+            COALESCE(m.nome, 'Geral') AS materia
 
+        FROM simulados s
 
-            $stmt =
-                $pdo->prepare(
-                    'SELECT
-                        s.*,
-                        m.nome AS materia
+        LEFT JOIN materias m
+            ON m.id = s.materia_id
 
-                     FROM simulados s
+        WHERE s.id = ?
+    ");
 
-                     JOIN materias m
-                        ON m.id = s.materia_id
+    $stmt->execute([$id]);
 
-                     WHERE s.id = ?'
-                );
+    $simulado = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    if (!$simulado) {
+        jsonResponse([
+            'erro' => 'Simulado não encontrado.'
+        ], 404);
+    }
 
-            $stmt->execute([
-                $id
-            ]);
+    $stmt = $pdo->prepare("
+        SELECT
+            id,
+            enunciado,
+            alternativa_a,
+            alternativa_b,
+            alternativa_c,
+            alternativa_d,
+            alternativa_e
 
+        FROM questoes
 
-            $simulado =
-                $stmt->fetch();
+        WHERE simulado_id = ?
 
+        ORDER BY id
+    ");
 
-            if (!$simulado) {
+    $stmt->execute([$id]);
 
-                jsonResponse([
-                    'erro' =>
-                        'Simulado não encontrado.'
-                ], 404);
-            }
+    $simulado['questoes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    jsonResponse($simulado);
 
-            $stmt =
-                $pdo->prepare(
-                    'SELECT
-                        id,
-                        enunciado,
-                        alternativa_a,
-                        alternativa_b,
-                        alternativa_c,
-                        alternativa_d,
-                        alternativa_e
+    break;
 
-                     FROM questoes
-
-                     WHERE simulado_id = ?
-
-                     ORDER BY id'
-                );
-
-
-            $stmt->execute([
-                $id
-            ]);
-
-
-            $simulado['questoes'] =
-                $stmt->fetchAll();
-
-
-            jsonResponse(
-                $simulado
-            );
-
-            break;
 
 
         /* =========================
@@ -968,6 +1308,69 @@ try {
             );
 
             break;
+            case 'registrar_jogo':
+
+    $uid = requireLogin();
+    requirePlanoPago($pdo, $uid);
+
+    if ($method !== 'POST') {
+        jsonResponse([
+            'erro' => 'Método inválido.'
+        ], 405);
+    }
+
+    $d = body();
+
+    $pontos = (int)($d['pontos'] ?? 0);
+
+    // Não permite pontuação negativa
+    $pontos = max(0, $pontos);
+
+    // Limite para evitar valores absurdos
+    $pontos = min(100, $pontos);
+
+    if ($pontos > 0) {
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO pontuacoes
+            (
+                usuario_id,
+                quantidade,
+                motivo
+            )
+            VALUES (?, ?, 'Jogo BRIO')"
+        );
+
+        $stmt->execute([
+            $uid,
+            $pontos
+        ]);
+    }
+
+    // Retorna o XP total atualizado
+    $stmt = $pdo->prepare(
+        "SELECT COALESCE(SUM(quantidade), 0) AS xp
+         FROM pontuacoes
+         WHERE usuario_id = ?"
+    );
+
+    $stmt->execute([$uid]);
+
+    $xp = (int)$stmt->fetch()['xp'];
+
+    $nivel = max(
+        1,
+        (int)floor($xp / 250) + 1
+    );
+
+    jsonResponse([
+        'ok' => true,
+        'pontos_jogo' => $pontos,
+        'xp' => $xp,
+        'nivel' => $nivel
+    ]);
+
+    break;
 
 
         /* =========================
@@ -976,22 +1379,51 @@ try {
 
         case 'temas_redacao':
 
-            requireLogin();
+    $uid = requireLogin();
 
+    // Verifica se o aluno possui plano pago ativo
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM usuarios u
+        INNER JOIN planos p
+            ON p.id = u.plano_atual_id
+        INNER JOIN assinaturas a
+            ON a.usuario_id = u.id
+            AND a.plano_id = p.id
+        WHERE u.id = ?
+          AND p.valor_mensal > 0
+          AND a.status = 'ativa'
+          AND a.fim >= CURDATE()
+    ");
 
-            $resultado =
-                $pdo->query(
-                    'SELECT *
-                     FROM temas_redacao
-                     ORDER BY id DESC'
-                );
+    $stmt->execute([$uid]);
 
+    $premium = (int)$stmt->fetchColumn() > 0;
 
-            jsonResponse(
-                $resultado->fetchAll()
-            );
+    if ($premium) {
 
-            break;
+        // Premium: todos os temas
+        $stmt = $pdo->query("
+            SELECT *
+            FROM temas_redacao
+            ORDER BY id DESC
+        ");
+
+    } else {
+
+        // Gratuito: apenas os 3 primeiros temas cadastrados
+        $stmt = $pdo->query("
+            SELECT *
+            FROM temas_redacao
+            ORDER BY id ASC
+            LIMIT 3
+        ");
+
+    }
+
+    jsonResponse($stmt->fetchAll());
+
+    break;
 
 
         /* =========================
@@ -1000,90 +1432,112 @@ try {
 
         case 'enviar_redacao':
 
-            $uid =
-                requireLogin();
+    $uid = requireLogin();
 
+    if ($method !== 'POST') {
+        jsonResponse([
+            'erro' => 'Método inválido.'
+        ], 405);
+    }
 
-            if ($method !== 'POST') {
+    $d = body();
 
-                jsonResponse([
-                    'erro' =>
-                        'Método inválido.'
-                ], 405);
-            }
+    $tema = (int)($d['tema_id'] ?? 0);
+    $texto = trim($d['texto'] ?? '');
 
+    // Validação da redação
+    if ($tema <= 0 || strlen($texto) < 50) {
+        jsonResponse([
+            'erro' => 'Escolha um tema e escreva uma redação com pelo menos 50 caracteres.'
+        ], 422);
+    }
 
-            $d =
-                body();
+    // Verifica se o tema existe no banco
+    $stmt = $pdo->prepare("
+        SELECT id
+        FROM temas_redacao
+        WHERE id = ?
+    ");
 
+    $stmt->execute([$tema]);
 
-            $tema =
-                (int)(
-                    $d['tema_id'] ?? 0
-                );
+    if (!$stmt->fetchColumn()) {
+        jsonResponse([
+            'erro' => 'Tema de redação não encontrado.'
+        ], 404);
+    }
 
+    // Verifica se o aluno possui plano Premium ativo
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM usuarios u
+        INNER JOIN planos p
+            ON p.id = u.plano_atual_id
+        INNER JOIN assinaturas a
+            ON a.usuario_id = u.id
+            AND a.plano_id = p.id
+        WHERE u.id = ?
+          AND p.valor_mensal > 0
+          AND a.status = 'ativa'
+          AND a.fim >= CURDATE()
+    ");
 
-            $texto =
-                trim(
-                    $d['texto'] ?? ''
-                );
+    $stmt->execute([$uid]);
 
+    $premium = (int)$stmt->fetchColumn() > 0;
 
-            if (
-                $tema <= 0 ||
-                strlen($texto) < 50
-            ) {
+    // Se não for Premium, verifica se o tema está entre os 3 gratuitos
+    if (!$premium) {
 
-                jsonResponse([
-                    'erro' =>
-                        'Escolha um tema e escreva uma redação com pelo menos 50 caracteres.'
-                ], 422);
-            }
+        $stmt = $pdo->query("
+            SELECT id
+            FROM temas_redacao
+            ORDER BY id ASC
+            LIMIT 3
+        ");
 
+        $temasGratuitos = array_map(
+            'intval',
+            $stmt->fetchAll(PDO::FETCH_COLUMN)
+        );
 
-            $stmt =
-                $pdo->prepare(
-                    'INSERT INTO redacoes
-                    (
-                        usuario_id,
-                        tema_id,
-                        texto
-                    )
-                    VALUES (?, ?, ?)'
-                );
-
-
-            $stmt->execute([
-                $uid,
-                $tema,
-                $texto
-            ]);
-
-
-            $stmt =
-                $pdo->prepare(
-                    "INSERT INTO pontuacoes
-                    (
-                        usuario_id,
-                        quantidade,
-                        motivo
-                    )
-                    VALUES (?, 25, 'Redação enviada')"
-                );
-
-
-            $stmt->execute([
-                $uid
-            ]);
-
-
+        if (!in_array($tema, $temasGratuitos, true)) {
             jsonResponse([
-                'ok' => true,
-                'mensagem' =>
-                    'Redação enviada para correção.'
-            ], 201);
+                'erro' => 'Este tema é exclusivo para assinantes Premium.'
+            ], 403);
+        }
+    }
 
-            break;
+    // Salva a redação no banco
+    $stmt = $pdo->prepare("
+        INSERT INTO redacoes
+            (usuario_id, tema_id, texto)
+        VALUES
+            (?, ?, ?)
+    ");
+
+    $stmt->execute([
+        $uid,
+        $tema,
+        $texto
+    ]);
+
+    // Adiciona XP pela redação enviada
+    $stmt = $pdo->prepare("
+        INSERT INTO pontuacoes
+            (usuario_id, quantidade, motivo)
+        VALUES
+            (?, 25, 'Redação enviada')
+    ");
+
+    $stmt->execute([$uid]);
+
+    jsonResponse([
+        'ok' => true,
+        'mensagem' => 'Redação enviada para correção.'
+    ], 201);
+
+    break;
 
 
         /* =========================
@@ -1137,183 +1591,205 @@ try {
            REDAÇÕES DO PROFESSOR
         ========================= */
 
-        case 'redacoes_professor':
+        
+case 'redacoes_professor':
 
-            requireProfessor();
+    requireProfessor();
 
+    $stmt = $pdo->query("
+        SELECT
+            r.id,
+            r.texto,
+            r.status,
+            r.data_envio,
+            u.nome AS aluno,
+            t.titulo AS tema
+        FROM redacoes r
+        JOIN usuarios u
+            ON u.id = r.usuario_id
+        JOIN temas_redacao t
+            ON t.id = r.tema_id
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM correcoes c
+            WHERE c.redacao_id = r.id
+        )
+        ORDER BY r.data_envio ASC, r.id ASC
+    ");
 
-            $sql = "
-                SELECT
-                    r.id,
-                    r.texto,
-                    r.status,
-                    r.data_envio,
-                    u.nome AS aluno,
-                    t.titulo AS tema,
-                    c.nota,
-                    c.comentario
+    jsonResponse($stmt->fetchAll());
 
-                FROM redacoes r
+    break;
 
-                JOIN usuarios u
-                    ON u.id = r.usuario_id
+    
+/* =====================================
+   HISTÓRICO DE CORREÇÕES DO PROFESSOR
+===================================== */
 
-                JOIN temas_redacao t
-                    ON t.id = r.tema_id
+case 'minhas_correcoes_professor':
 
-                LEFT JOIN correcoes c
-                    ON c.redacao_id = r.id
+    $professorId = requireProfessor();
 
-                ORDER BY
-                    r.status = 'enviada' DESC,
-                    r.id DESC
-            ";
+    $stmt = $pdo->prepare("
+        SELECT
+            c.id AS correcao_id,
+            r.id AS redacao_id,
+            r.texto,
+            r.data_envio,
+            u.nome AS aluno,
+            t.titulo AS tema,
+            c.nota,
+            c.comentario,
+            c.data_correcao
+        FROM correcoes c
+        INNER JOIN redacoes r
+            ON r.id = c.redacao_id
+        INNER JOIN usuarios u
+            ON u.id = r.usuario_id
+        INNER JOIN temas_redacao t
+            ON t.id = r.tema_id
+        WHERE c.professor_id = ?
+        ORDER BY c.data_correcao DESC, c.id DESC
+    ");
 
+    $stmt->execute([$professorId]);
 
-            $resultado =
-                $pdo->query($sql);
+    jsonResponse($stmt->fetchAll());
 
+    break;
 
-            jsonResponse(
-                $resultado->fetchAll()
-            );
-
-            break;
 
 
         /* =========================
            CORRIGIR REDAÇÃO
         ========================= */
 
-        case 'corrigir_redacao':
+        
+case 'corrigir_redacao':
 
-            $professorId =
-                requireProfessor();
+    $professorId = requireProfessor();
 
+    if ($method !== 'POST') {
+        jsonResponse([
+            'erro' => 'Método inválido.'
+        ], 405);
+    }
 
-            if ($method !== 'POST') {
+    $d = body();
 
-                jsonResponse([
-                    'erro' =>
-                        'Método inválido.'
-                ], 405);
-            }
+    $redacaoId = (int)($d['redacao_id'] ?? 0);
+    $notaInformada = $d['nota'] ?? null;
+    $comentario = trim($d['comentario'] ?? '');
 
+    if (
+        $redacaoId <= 0 ||
+        !is_numeric($notaInformada) ||
+        (float)$notaInformada < 0 ||
+        (float)$notaInformada > 1000 ||
+        $comentario === ''
+    ) {
+        jsonResponse([
+            'erro' => 'Informe uma nota entre 0 e 1000 e um comentário.'
+        ], 422);
+    }
 
-            $d =
-                body();
+    $nota = (float)$notaInformada;
 
+    $pdo->beginTransaction();
 
-            $redacaoId =
-                (int)(
-                    $d['redacao_id'] ?? 0
-                );
+    try {
 
+        // Bloqueia a redação durante a correção.
+        $stmt = $pdo->prepare("
+            SELECT id
+            FROM redacoes
+            WHERE id = ?
+            FOR UPDATE
+        ");
 
-            $nota =
-                (float)(
-                    $d['nota'] ?? 0
-                );
+        $stmt->execute([$redacaoId]);
 
-
-            $comentario =
-                trim(
-                    $d['comentario'] ?? ''
-                );
-
-
-            if (
-                $nota < 0 ||
-                $nota > 1000 ||
-                $comentario === ''
-            ) {
-
-                jsonResponse([
-                    'erro' =>
-                        'Informe nota entre 0 e 1000 e um comentário.'
-                ], 422);
-            }
-
-
-            $stmt =
-                $pdo->prepare(
-                    'INSERT INTO correcoes
-                    (
-                        redacao_id,
-                        professor_id,
-                        nota,
-                        comentario
-                    )
-                    VALUES (?, ?, ?, ?)
-
-                    ON DUPLICATE KEY UPDATE
-                        professor_id =
-                            VALUES(professor_id),
-
-                        nota =
-                            VALUES(nota),
-
-                        comentario =
-                            VALUES(comentario),
-
-                        data_correcao =
-                            NOW()'
-                );
-
-
-            $stmt->execute([
-                $redacaoId,
-                $professorId,
-                $nota,
-                $comentario
-            ]);
-
-
-            $stmt =
-                $pdo->prepare(
-                    "UPDATE redacoes
-                     SET status = 'corrigida'
-                     WHERE id = ?"
-                );
-
-
-            $stmt->execute([
-                $redacaoId
-            ]);
-
-
-            $stmt =
-                $pdo->prepare(
-                    "INSERT INTO pontuacoes
-                    (
-                        usuario_id,
-                        quantidade,
-                        motivo
-                    )
-
-                    SELECT
-                        usuario_id,
-                        40,
-                        'Redação corrigida'
-
-                    FROM redacoes
-
-                    WHERE id = ?"
-                );
-
-
-            $stmt->execute([
-                $redacaoId
-            ]);
-
+        if (!$stmt->fetch()) {
+            $pdo->rollBack();
 
             jsonResponse([
-                'ok' => true,
-                'mensagem' =>
-                    'Correção salva.'
-            ]);
+                'erro' => 'Redação não encontrada.'
+            ], 404);
+        }
 
-            break;
+        // Verifica se outro professor já corrigiu.
+        $stmt = $pdo->prepare("
+            SELECT id
+            FROM correcoes
+            WHERE redacao_id = ?
+            LIMIT 1
+        ");
+
+        $stmt->execute([$redacaoId]);
+
+        if ($stmt->fetch()) {
+            $pdo->rollBack();
+
+            jsonResponse([
+                'erro' => 'Esta redação já foi corrigida por outro professor.'
+            ], 409);
+        }
+
+        // Registra a correção e seu autor.
+        $stmt = $pdo->prepare("
+            INSERT INTO correcoes
+                (redacao_id, professor_id, nota, comentario)
+            VALUES (?, ?, ?, ?)
+        ");
+
+        $stmt->execute([
+            $redacaoId,
+            $professorId,
+            $nota,
+            $comentario
+        ]);
+
+        // Atualiza a redação.
+        $stmt = $pdo->prepare("
+            UPDATE redacoes
+            SET status = 'corrigida'
+            WHERE id = ?
+        ");
+
+        $stmt->execute([$redacaoId]);
+
+        // Mantém os 40 XP existentes no BRIO.
+        $stmt = $pdo->prepare("
+            INSERT INTO pontuacoes
+                (usuario_id, quantidade, motivo)
+            SELECT
+                usuario_id,
+                40,
+                'Redação corrigida'
+            FROM redacoes
+            WHERE id = ?
+        ");
+
+        $stmt->execute([$redacaoId]);
+
+        $pdo->commit();
+
+        jsonResponse([
+            'ok' => true,
+            'mensagem' => 'Correção salva com sucesso!'
+        ]);
+
+    } catch (Throwable $erro) {
+
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        throw $erro;
+    }
+
+    break;
+
 
 
         /* =========================
@@ -1324,6 +1800,8 @@ try {
 
             $uid =
                 requireLogin();
+
+            requirePlanoPago($pdo, $uid);
 
 
             if ($method === 'GET') {

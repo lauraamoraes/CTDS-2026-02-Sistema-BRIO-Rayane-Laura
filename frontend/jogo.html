@@ -1,0 +1,1210 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Batalha de Conhecimentos Gerais | BRIO</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="css/style.css?v=20261109-8">
+
+    <style>
+        /* ==========================================
+           BRIO - PÁGINA DE JOGOS
+        ========================================== */
+
+        :root {
+            --roxo: #603d91;
+            --roxo-escuro: #49326f;
+            --roxo-claro: #f0e8fa;
+            --lilas: #f7f2fc;
+            --fundo: #fffaf8;
+            --texto: #493550;
+            --texto-suave: #8b7294;
+            --borda: #e6d8f0;
+            --verde: #27845b;
+            --vermelho: #c44747;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body.pagina-jogos {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--fundo);
+            color: var(--texto);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* CONTAINER PRINCIPAL */
+
+        .pagina-jogos .jogo-container {
+            width: min(1320px, 94%);
+            margin: 45px auto 80px;
+            padding-bottom: 30px;
+        }
+
+        /* VOLTAR */
+
+        .pagina-jogos .jogo-voltar {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--roxo);
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .pagina-jogos .jogo-voltar:hover {
+            text-decoration: underline;
+        }
+
+        /* TÍTULO DA PÁGINA */
+
+        .pagina-jogos .jogo-topo {
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .pagina-jogos .jogo-topo h1 {
+            color: var(--roxo);
+            font-size: clamp(30px, 4vw, 43px);
+            font-weight: 800;
+            line-height: 1.25;
+            margin: 0 0 12px;
+        }
+
+        .pagina-jogos .jogo-topo p {
+            color: var(--texto-suave);
+            font-size: 17px;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* BANNER LILÁS */
+
+        .pagina-jogos .jogo-banner {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            background: var(--roxo-claro);
+            border: 1px solid #e1d0f5;
+            border-radius: 28px;
+            padding: 28px 35px;
+            margin-bottom: 36px;
+        }
+
+        .pagina-jogos .jogo-banner-icone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 86px;
+            height: 86px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 22px;
+            font-size: 44px;
+        }
+
+        .pagina-jogos .jogo-banner h2 {
+            color: var(--roxo);
+            font-size: 25px;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+
+        .pagina-jogos .jogo-banner p {
+            color: #806c90;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* CARD PRINCIPAL */
+
+        .pagina-jogos .jogo-card {
+            background: #ffffff;
+            border: 1px solid var(--borda);
+            border-radius: 28px;
+            padding: 42px;
+            box-shadow: 0 8px 28px rgba(91, 63, 136, 0.04);
+        }
+
+        /* TELA INICIAL */
+
+        .pagina-jogos .tela-inicial,
+        .pagina-jogos .tela-final {
+            text-align: center;
+        }
+
+        .pagina-jogos .icone-jogo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 22px;
+            border-radius: 24px;
+            background: var(--lilas);
+            font-size: 48px;
+        }
+
+        .pagina-jogos .tela-inicial h2,
+        .pagina-jogos .tela-final h2 {
+            color: var(--roxo-escuro);
+            font-size: clamp(24px, 3vw, 30px);
+            font-weight: 800;
+            margin: 0 0 15px;
+        }
+
+        .pagina-jogos .tela-inicial > p,
+        .pagina-jogos .tela-final > p {
+            color: #806d8b;
+            font-size: 16px;
+            line-height: 1.8;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* REGRAS */
+
+        .pagina-jogos .regras {
+            background: #faf6fd;
+            border-radius: 20px;
+            padding: 26px 30px;
+            margin: 30px auto;
+            max-width: 950px;
+            text-align: left;
+            line-height: 2;
+            color: #685375;
+            font-size: 16px;
+        }
+
+        .pagina-jogos .regras strong {
+            display: block;
+            color: var(--roxo);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* BOTÕES */
+
+        .pagina-jogos .botao {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 15px;
+            background: var(--roxo);
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .pagina-jogos .botao:hover:not(:disabled) {
+            background: #4e317e;
+            transform: translateY(-2px);
+        }
+
+        .pagina-jogos .botao:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .pagina-jogos .botao-secundario {
+            background: var(--roxo-claro);
+            color: var(--roxo);
+        }
+
+        .pagina-jogos .botao-secundario:hover:not(:disabled) {
+            background: #e4d5f4;
+        }
+
+        .pagina-jogos .botao:focus-visible,
+        .pagina-jogos .opcao:focus-visible {
+            outline: 3px solid #b49bd4;
+            outline-offset: 3px;
+        }
+
+        /* TELA DAS PERGUNTAS */
+
+        .pagina-jogos .jogo-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            color: var(--roxo);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .pagina-jogos .barra-fundo {
+            width: 100%;
+            height: 12px;
+            background: #eee5f3;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 35px;
+        }
+
+        .pagina-jogos .barra-progresso {
+            width: 0%;
+            height: 100%;
+            background: #a984c1;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .pagina-jogos #pergunta {
+            color: var(--roxo-escuro);
+            font-size: clamp(21px, 3vw, 27px);
+            font-weight: 700;
+            line-height: 1.5;
+            margin: 0 0 28px;
+        }
+
+        /* ALTERNATIVAS */
+
+        .pagina-jogos .opcoes {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .pagina-jogos .opcao {
+            min-height: 75px;
+            padding: 18px 20px;
+            border: 2px solid var(--borda);
+            border-radius: 16px;
+            background: #ffffff;
+            color: var(--texto);
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagina-jogos .opcao:hover:not(:disabled) {
+            border-color: var(--roxo);
+            background: #faf7fd;
+            transform: translateY(-2px);
+        }
+
+        .pagina-jogos .opcao:disabled {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .pagina-jogos .opcao.correta {
+            border-color: var(--verde);
+            background: #e9f7ef;
+            color: #17633f;
+            font-weight: 600;
+        }
+
+        .pagina-jogos .opcao.errada {
+            border-color: var(--vermelho);
+            background: #fff0f0;
+            color: #9d2e2e;
+            font-weight: 600;
+        }
+
+        /* FEEDBACK */
+
+        .pagina-jogos .feedback {
+            display: none;
+            padding: 18px 22px;
+            margin-top: 24px;
+            border-radius: 15px;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .pagina-jogos .feedback.visivel {
+            display: block;
+        }
+
+        .pagina-jogos .feedback.acerto {
+            background: #e9f7ef;
+            color: #17633f;
+        }
+
+        .pagina-jogos .feedback.erro {
+            background: #fff0f0;
+            color: #9d2e2e;
+        }
+
+        /* AÇÕES */
+
+        .pagina-jogos .jogo-acoes {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 30px;
+        }
+
+        /* RESULTADO */
+
+        .pagina-jogos .resultado-pontos {
+            color: var(--roxo);
+            font-size: 55px;
+            font-weight: 800;
+            margin: 15px 0;
+        }
+
+        .pagina-jogos .resultado-detalhe {
+            background: #faf6fd;
+            border-radius: 20px;
+            padding: 24px;
+            color: #715d80;
+            line-height: 2;
+            margin-top: 22px;
+        }
+
+        .pagina-jogos .mensagem {
+            margin-top: 18px;
+            color: #715d80;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .pagina-jogos .oculto {
+            display: none !important;
+        }
+
+        /* RESPONSIVIDADE */
+
+        @media (max-width: 700px) {
+            .pagina-jogos .jogo-container {
+                width: 93%;
+                margin-top: 25px;
+            }
+
+            .pagina-jogos .jogo-banner {
+                padding: 22px;
+                gap: 15px;
+                border-radius: 22px;
+            }
+
+            .pagina-jogos .jogo-banner-icone {
+                width: 60px;
+                height: 60px;
+                font-size: 32px;
+                border-radius: 16px;
+            }
+
+            .pagina-jogos .jogo-banner h2 {
+                font-size: 19px;
+            }
+
+            .pagina-jogos .jogo-banner p {
+                font-size: 14px;
+            }
+
+            .pagina-jogos .jogo-card {
+                padding: 25px 20px;
+                border-radius: 22px;
+            }
+
+            .pagina-jogos .regras {
+                padding: 20px;
+                font-size: 14px;
+            }
+
+            .pagina-jogos .opcoes {
+                grid-template-columns: 1fr;
+            }
+
+            .pagina-jogos .botao {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .pagina-jogos .jogo-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .pagina-jogos .jogo-status {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body class="pagina-jogos">
+
+    <main class="jogo-container">
+
+        <a href="dashboard.html" class="jogo-voltar">
+            ← Voltar
+        </a>
+
+        <!-- CABEÇALHO -->
+
+        <header class="jogo-topo">
+          <span class="badge">ÁREA DE JOGOS</span>
+            <h1>🧠 Batalha de Conhecimentos Gerais</h1>
+            <p>
+                Teste seus conhecimentos, acumule XP e evolua com o BRIO!
+            </p>
+        </header>
+
+        <!-- BANNER -->
+
+        <section class="jogo-banner">
+            <div class="jogo-banner-icone">🎮</div>
+
+            <div>
+                <h2>Aprenda, jogue e evolua! 💜</h2>
+                <p>
+                    Cada desafio é uma nova oportunidade
+                    de conquistar conhecimentos e ganhar XP.
+                </p>
+            </div>
+        </section>
+
+        <!-- CARD DO JOGO -->
+
+        <section class="jogo-card">
+
+            <!-- TELA INICIAL -->
+
+            <div id="telaInicial" class="tela-inicial">
+
+                <div class="icone-jogo">🎯</div>
+
+                <h2>Vamos testar seus conhecimentos?</h2>
+
+                <p>
+                    A cada partida, você recebe perguntas sorteadas
+                    de um banco de conhecimentos gerais.
+                </p>
+
+                <div class="regras">
+                    <strong>Como funciona:</strong>
+
+                    🎲 5 perguntas sorteadas por partida<br>
+                    📝 4 alternativas por pergunta<br>
+                    ⭐ 10 XP por resposta correta<br>
+                    🏆 Até 50 XP por partida
+                </div>
+
+                <button
+                    class="botao"
+                    id="btnComecar"
+                    type="button"
+                >
+                    Começar jogo
+                </button>
+
+            </div>
+
+            <!-- TELA DAS PERGUNTAS -->
+
+            <div id="telaPerguntas" class="oculto">
+
+                <div class="jogo-status">
+                    <span id="contadorPergunta">
+                        Pergunta 1 de 5
+                    </span>
+
+                    <span id="pontuacaoAtual">
+                        ⭐ 0 XP nesta partida
+                    </span>
+                </div>
+
+                <div
+                    class="barra-fundo"
+                    role="progressbar"
+                    aria-label="Progresso das perguntas"
+                    aria-valuemin="0"
+                    aria-valuemax="5"
+                    aria-valuenow="0"
+                    id="barraContainer"
+                >
+                    <div
+                        class="barra-progresso"
+                        id="barraProgresso"
+                    ></div>
+                </div>
+
+                <h2 id="pergunta">
+                    Carregando pergunta...
+                </h2>
+
+                <div id="opcoes" class="opcoes"></div>
+
+                <div
+                    id="feedback"
+                    class="feedback"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <div class="jogo-acoes">
+                    <button
+                        id="btnProxima"
+                        class="botao"
+                        type="button"
+                        disabled
+                    >
+                        Próxima pergunta
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- TELA FINAL -->
+
+            <div id="telaFinal" class="tela-final oculto">
+
+                <div class="icone-jogo" id="iconeFinal">
+                    🏆
+                </div>
+
+                <h2 id="tituloFinal">
+                    Partida concluída!
+                </h2>
+
+                <p>Você ganhou nesta partida:</p>
+
+                <div class="resultado-pontos" id="xpFinal">
+                    0 XP
+                </div>
+
+                <div class="resultado-detalhe">
+                    <div id="acertosFinal">
+                        Acertos: 0 de 5
+                    </div>
+
+                    <div id="mensagemFinal"></div>
+
+                    <div id="xpAcumulado"></div>
+                </div>
+
+                <p
+                    id="mensagemSalvamento"
+                    class="mensagem"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+                <div class="jogo-acoes">
+
+                    <button
+                        class="botao"
+                        id="btnJogarNovamente"
+                        type="button"
+                    >
+                        Jogar novamente
+                    </button>
+
+                    <a
+                        href="progresso.html"
+                        class="botao botao-secundario"
+                    >
+                        Ver meu progresso
+                    </a>
+
+                    <a
+                        href="dashboard.html"
+                        class="botao botao-secundario"
+                    >
+                        ← Voltar
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT PRINCIPAL DO BRIO -->
+
+    <script src="js/app.js?v=20261109-8"></script>
+
+    <script>
+
+        /* ==========================================
+           BANCO DE PERGUNTAS
+        ========================================== */
+
+        const bancoPerguntas = [
+
+            {
+                pergunta: "Qual é o maior planeta do Sistema Solar?",
+                opcoes: ["Terra", "Marte", "Júpiter", "Vênus"],
+                correta: "Júpiter"
+            },
+
+            {
+                pergunta: "Quantos lados tem um hexágono?",
+                opcoes: ["Cinco", "Seis", "Sete", "Oito"],
+                correta: "Seis"
+            },
+
+            {
+                pergunta: "Qual é a capital do Japão?",
+                opcoes: ["Seul", "Pequim", "Tóquio", "Bangkok"],
+                correta: "Tóquio"
+            },
+
+            {
+                pergunta: "Qual é o resultado de 9 × 8?",
+                opcoes: ["63", "72", "81", "64"],
+                correta: "72"
+            },
+
+            {
+                pergunta: "Qual animal é conhecido como o rei da selva?",
+                opcoes: ["Tigre", "Leão", "Elefante", "Leopardo"],
+                correta: "Leão"
+            },
+
+            {
+                pergunta: "Qual é o maior oceano do planeta?",
+                opcoes: ["Atlântico", "Índico", "Ártico", "Pacífico"],
+                correta: "Pacífico"
+            },
+
+            {
+                pergunta: "Quantos minutos tem uma hora?",
+                opcoes: ["30", "45", "60", "100"],
+                correta: "60"
+            },
+
+            {
+                pergunta: "Qual destes animais é um mamífero?",
+                opcoes: ["Tubarão", "Golfinho", "Polvo", "Tartaruga"],
+                correta: "Golfinho"
+            },
+
+            {
+                pergunta: "Em qual continente fica o Egito?",
+                opcoes: ["África", "Europa", "Ásia", "América"],
+                correta: "África"
+            },
+
+            {
+                pergunta: "Qual é a fórmula química da água?",
+                opcoes: ["CO2", "O2", "H2O", "NaCl"],
+                correta: "H2O"
+            },
+
+            {
+                pergunta: "Quantos dias tem um ano bissexto?",
+                opcoes: ["364", "365", "366", "367"],
+                correta: "366"
+            },
+
+            {
+                pergunta: "Qual é a estrela mais próxima da Terra?",
+                opcoes: ["Sirius", "Sol", "Vega", "Betelgeuse"],
+                correta: "Sol"
+            },
+
+            {
+                pergunta: "Qual instrumento mede a temperatura?",
+                opcoes: ["Barômetro", "Termômetro", "Bússola", "Régua"],
+                correta: "Termômetro"
+            },
+
+            {
+                pergunta: "Qual é a língua oficial do Brasil?",
+                opcoes: ["Espanhol", "Português", "Inglês", "Francês"],
+                correta: "Português"
+            },
+
+            {
+                pergunta: "Quanto é 144 dividido por 12?",
+                opcoes: ["10", "11", "12", "14"],
+                correta: "12"
+            },
+
+            {
+                pergunta: "Qual destes animais é uma ave?",
+                opcoes: ["Morcego", "Pinguim", "Golfinho", "Cavalo"],
+                correta: "Pinguim"
+            },
+
+            {
+                pergunta: "Quem escreveu Dom Casmurro?",
+                opcoes: [
+                    "Machado de Assis",
+                    "Monteiro Lobato",
+                    "José de Alencar",
+                    "Carlos Drummond de Andrade"
+                ],
+                correta: "Machado de Assis"
+            },
+
+            {
+                pergunta: "Qual continente tem mais países?",
+                opcoes: ["Europa", "África", "América do Sul", "Oceania"],
+                correta: "África"
+            },
+
+            {
+                pergunta: "Qual é a fórmula química do gás carbônico?",
+                opcoes: ["CO2", "H2O", "O2", "H2"],
+                correta: "CO2"
+            },
+
+            {
+                pergunta: "Qual é o resultado de 15 + 27?",
+                opcoes: ["32", "40", "42", "45"],
+                correta: "42"
+            },
+
+            {
+                pergunta: "Qual planeta é conhecido como planeta vermelho?",
+                opcoes: ["Vênus", "Marte", "Saturno", "Mercúrio"],
+                correta: "Marte"
+            },
+
+            {
+                pergunta: "Qual é o maior órgão do corpo humano?",
+                opcoes: ["Coração", "Fígado", "Pele", "Pulmão"],
+                correta: "Pele"
+            },
+
+            {
+                pergunta: "Em qual país ficam as pirâmides de Gizé?",
+                opcoes: ["México", "Egito", "Grécia", "Índia"],
+                correta: "Egito"
+            },
+
+            {
+                pergunta: "Quantas cores tem o arco-íris tradicionalmente?",
+                opcoes: ["Cinco", "Seis", "Sete", "Oito"],
+                correta: "Sete"
+            },
+
+            {
+                pergunta: "Qual é o animal terrestre mais rápido?",
+                opcoes: ["Leão", "Cavalo", "Guepardo", "Antílope"],
+                correta: "Guepardo"
+            },
+
+            {
+                pergunta: "Qual é a capital de Portugal?",
+                opcoes: ["Porto", "Lisboa", "Coimbra", "Faro"],
+                correta: "Lisboa"
+            },
+
+            {
+                pergunta: "Qual é o resultado de 7 ao quadrado?",
+                opcoes: ["14", "42", "49", "56"],
+                correta: "49"
+            },
+
+            {
+                pergunta: "Qual destes materiais é atraído por um ímã comum?",
+                opcoes: ["Madeira", "Plástico", "Ferro", "Vidro"],
+                correta: "Ferro"
+            },
+
+            {
+                pergunta: "Qual é o satélite natural da Terra?",
+                opcoes: ["Sol", "Lua", "Marte", "Vênus"],
+                correta: "Lua"
+            },
+
+            {
+                pergunta: "Qual é o principal gás da atmosfera terrestre?",
+                opcoes: [
+                    "Oxigênio",
+                    "Nitrogênio",
+                    "Hidrogênio",
+                    "Gás carbônico"
+                ],
+                correta: "Nitrogênio"
+            }
+
+        ];
+
+        /* ==========================================
+           CONFIGURAÇÕES
+        ========================================== */
+
+        const TOTAL_PERGUNTAS = 5;
+        const XP_POR_ACERTO = 10;
+
+        let perguntasPartida = [];
+        let indiceAtual = 0;
+        let acertos = 0;
+        let xpPartida = 0;
+        let respondida = false;
+        let salvando = false;
+
+        const telaInicial = document.getElementById("telaInicial");
+        const telaPerguntas = document.getElementById("telaPerguntas");
+        const telaFinal = document.getElementById("telaFinal");
+
+        const btnComecar = document.getElementById("btnComecar");
+        const btnProxima = document.getElementById("btnProxima");
+        const btnJogarNovamente = document.getElementById("btnJogarNovamente");
+
+        /* ==========================================
+           EMBARALHAR PERGUNTAS
+        ========================================== */
+
+        function embaralhar(lista) {
+
+            const copia = [...lista];
+
+            for (let i = copia.length - 1; i > 0; i--) {
+
+                const j = Math.floor(Math.random() * (i + 1));
+
+                [copia[i], copia[j]] = [copia[j], copia[i]];
+
+            }
+
+            return copia;
+        }
+
+        function sortearPerguntas(quantidade = TOTAL_PERGUNTAS) {
+
+            return embaralhar(bancoPerguntas)
+                .slice(0, Math.min(quantidade, bancoPerguntas.length))
+                .map(pergunta => ({
+                    ...pergunta,
+                    opcoes: embaralhar(pergunta.opcoes)
+                }));
+
+        }
+
+        /* ==========================================
+           CONTROLE DAS TELAS
+        ========================================== */
+
+        function mostrarTela(tela) {
+
+            telaInicial.classList.add("oculto");
+            telaPerguntas.classList.add("oculto");
+            telaFinal.classList.add("oculto");
+
+            tela.classList.remove("oculto");
+
+        }
+
+        /* ==========================================
+           INICIAR JOGO
+        ========================================== */
+
+        function iniciarJogo() {
+
+            perguntasPartida = sortearPerguntas(TOTAL_PERGUNTAS);
+
+            indiceAtual = 0;
+            acertos = 0;
+            xpPartida = 0;
+            respondida = false;
+            salvando = false;
+
+            btnComecar.disabled = false;
+            btnJogarNovamente.disabled = false;
+            btnProxima.disabled = true;
+
+            document.getElementById("mensagemSalvamento").textContent = "";
+            document.getElementById("xpAcumulado").textContent = "";
+
+            mostrarTela(telaPerguntas);
+
+            exibirPergunta();
+
+        }
+
+        /* ==========================================
+           EXIBIR PERGUNTA
+        ========================================== */
+
+        function exibirPergunta() {
+
+            respondida = false;
+
+            const perguntaAtual = perguntasPartida[indiceAtual];
+
+            document.getElementById("contadorPergunta").textContent =
+                `Pergunta ${indiceAtual + 1} de ${perguntasPartida.length}`;
+
+            document.getElementById("pontuacaoAtual").textContent =
+                `⭐ ${xpPartida} XP nesta partida`;
+
+            document.getElementById("barraProgresso").style.width =
+                `${(indiceAtual / perguntasPartida.length) * 100}%`;
+
+            document.getElementById("barraContainer").setAttribute(
+                "aria-valuenow",
+                String(indiceAtual)
+            );
+
+            document.getElementById("pergunta").textContent =
+                perguntaAtual.pergunta;
+
+            const opcoesContainer = document.getElementById("opcoes");
+
+            opcoesContainer.replaceChildren();
+
+            const feedback = document.getElementById("feedback");
+
+            feedback.textContent = "";
+            feedback.className = "feedback";
+
+            perguntaAtual.opcoes.forEach(opcao => {
+
+                const botao = document.createElement("button");
+
+                botao.type = "button";
+                botao.className = "opcao";
+                botao.textContent = opcao;
+
+                botao.addEventListener("click", () => {
+                    verificarResposta(opcao, botao);
+                });
+
+                opcoesContainer.appendChild(botao);
+
+            });
+
+            btnProxima.disabled = true;
+
+            btnProxima.textContent =
+                indiceAtual === perguntasPartida.length - 1
+                    ? "Ver resultado"
+                    : "Próxima pergunta";
+
+        }
+
+        /* ==========================================
+           VERIFICAR RESPOSTA
+        ========================================== */
+
+        function verificarResposta(resposta, botaoSelecionado) {
+
+            if (respondida) return;
+
+            respondida = true;
+
+            const perguntaAtual = perguntasPartida[indiceAtual];
+
+            const acertou = resposta === perguntaAtual.correta;
+
+            const botoes = document.querySelectorAll("#opcoes .opcao");
+
+            botoes.forEach(botao => {
+
+                botao.disabled = true;
+
+                if (botao.textContent === perguntaAtual.correta) {
+                    botao.classList.add("correta");
+                }
+
+            });
+
+            const feedback = document.getElementById("feedback");
+
+            if (acertou) {
+
+                acertos++;
+
+                xpPartida += XP_POR_ACERTO;
+
+                feedback.textContent =
+                    `🎉 Resposta correta! Você ganhou ${XP_POR_ACERTO} XP.`;
+
+                feedback.className = "feedback visivel acerto";
+
+            } else {
+
+                botaoSelecionado.classList.add("errada");
+
+                feedback.textContent =
+                    `Não foi dessa vez! A resposta correta é: ${perguntaAtual.correta}.`;
+
+                feedback.className = "feedback visivel erro";
+
+            }
+
+            document.getElementById("pontuacaoAtual").textContent =
+                `⭐ ${xpPartida} XP nesta partida`;
+
+            btnProxima.disabled = false;
+
+        }
+
+        /* ==========================================
+           PRÓXIMA PERGUNTA
+        ========================================== */
+
+        function proximaPergunta() {
+
+            if (!respondida) return;
+
+            indiceAtual++;
+
+            if (indiceAtual < perguntasPartida.length) {
+
+                exibirPergunta();
+
+            } else {
+
+                finalizarJogo();
+
+            }
+
+        }
+
+        /* ==========================================
+           FINALIZAR JOGO E SALVAR XP
+        ========================================== */
+
+        async function finalizarJogo() {
+
+            mostrarTela(telaFinal);
+
+            document.getElementById("barraProgresso").style.width = "100%";
+
+            document.getElementById("barraContainer").setAttribute(
+                "aria-valuenow",
+                String(perguntasPartida.length)
+            );
+
+            document.getElementById("xpFinal").textContent =
+                `${xpPartida} XP`;
+
+            document.getElementById("acertosFinal").textContent =
+                `Acertos: ${acertos} de ${perguntasPartida.length}`;
+
+            let mensagem =
+                "Continue praticando para melhorar sua pontuação!";
+
+            if (acertos === perguntasPartida.length) {
+
+                mensagem = "Incrível! Você acertou todas as perguntas!";
+
+            } else if (acertos >= 3) {
+
+                mensagem = "Muito bem! Você está mandando bem!";
+
+            } else if (acertos >= 1) {
+
+                mensagem = "Bom começo! Continue aprendendo e evoluindo!";
+
+            }
+
+            document.getElementById("mensagemFinal").textContent =
+                mensagem;
+
+            document.getElementById("iconeFinal").textContent =
+                acertos === perguntasPartida.length ? "🏆" : "🎯";
+
+            document.getElementById("mensagemSalvamento").textContent =
+                "Salvando seus pontos...";
+
+            btnJogarNovamente.disabled = true;
+
+            if (salvando) return;
+
+            salvando = true;
+
+            try {
+
+                const resultado = await api("registrar_jogo", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        pontos: xpPartida
+                    })
+                });
+
+                document.getElementById("mensagemSalvamento").textContent =
+                    "✅ Seus pontos foram enviados para sua conta!";
+
+                if (resultado && resultado.xp !== undefined) {
+
+                    document.getElementById("xpAcumulado").textContent =
+                        `XP acumulado: ${resultado.xp}`;
+
+                }
+
+            } catch (erro) {
+
+                console.error("Erro ao salvar XP:", erro);
+
+                document.getElementById("mensagemSalvamento").textContent =
+                    "⚠️ Não foi possível confirmar o salvamento dos pontos. " +
+                    "Verifique sua conexão e tente novamente mais tarde.";
+
+            } finally {
+
+                btnJogarNovamente.disabled = false;
+
+            }
+
+        }
+
+        /* ==========================================
+           EVENTOS DOS BOTÕES
+        ========================================== */
+
+        btnComecar.addEventListener("click", iniciarJogo);
+
+        btnProxima.addEventListener("click", proximaPergunta);
+
+        btnJogarNovamente.addEventListener("click", iniciarJogo);
+
+        /* ==========================================
+           VERIFICAR ACESSO À PÁGINA
+        ========================================== */
+
+        async function prepararPagina() {
+
+            const permitido = await requirePaidPlan();
+
+            if (!permitido) return;
+
+            if (typeof header === "function") {
+                header();
+            }
+
+        }
+
+        prepararPagina().catch(erro => {
+            console.error("Erro ao preparar a página de jogos:", erro);
+        });
+
+    </script>
+
+</body>
+</html>

@@ -1,4 +1,51 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Redações — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header><main class="container">
-<h1>Redações</h1><p class="muted">Escolha um tema, escreva e envie para correção.</p><h2 class="section-title">Temas disponíveis</h2><div id="temas" class="grid"></div>
-<h2 class="section-title">Minhas redações</h2><div id="minhas" class="grid"></div></main><script src="js/app.js"></script><script>initRedacoes()</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Redações — BRIO</title>
+    <link rel="stylesheet" href="css/style.css?v=20261103">
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body class="pagina-estudos-brio">
+    <header></header>
+    <main class="container">
+        <a href="dashboard.html" class="voltar">
+                    ← Voltar
+                </a>
+        <br><br>
+        <span class="badge">ÁREA DE REDAÇÕES</span>
+        <h1>Redações</h1>
+        <p class="muted">Escolha um tema, escreva e envie para correção.</p>
+        <h2 class="section-title">Temas disponíveis</h2>
+        <div id="temas" class="grid"></div>
+        <div class="redacoes-historico">
+
+    <section class="redacoes-secao">
+        <h2>⏳ Aguardando correção</h2>
+        <p class="redacoes-descricao">
+            Redações que você enviou e ainda serão avaliadas por um professor.
+        </p>
+
+        <div id="redacoesPendentes"></div>
+    </section>
+
+    <section class="redacoes-secao">
+        <h2>✅ Redações corrigidas</h2>
+        <p class="redacoes-descricao">
+            Consulte suas redações avaliadas, notas e comentários dos professores.
+        </p>
+
+        <div id="redacoesCorrigidas"></div>
+    </section>
+
+</div>
+    </main>
+    <script src="js/app.js?v=20261103"></script>
+    <script>initRedacoes()</script>
+</body>
+
+</html>

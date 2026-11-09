@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cadastro de Professor | BRIO</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css?v=20261103">
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body class="pagina-cadastro-professor">
+
+    <header class="professor-header">
+
+        <a href="index.html" class="professor-logo">
+            BRIO
+        </a>
+
+        <a href="index.html" class="professor-voltar">
+            ← Voltar ao início
+        </a>
+
+    </header>
+
+    <main class="professor-container">
+
+        <section class="professor-card">
+
+            <div class="professor-card-topo">
+
+                <span class="professor-etiqueta">
+                    ÁREA DO PROFESSOR
+                </span>
+
+                <h1>Faça parte do BRIO 💜</h1>
+
+                <p>
+                    Cadastre-se como professor e ajude
+                    estudantes a conquistarem seus objetivos.
+                </p>
+
+            </div>
+
+            <form id="formCadastroProfessor" enctype="multipart/form-data">
+
+                <!-- NOME -->
+
+                <div class="professor-campo">
+
+                    <label for="nomeProfessor">
+                        Nome completo
+                    </label>
+
+                    <input type="text" id="nomeProfessor" name="nome" placeholder="Digite seu nome completo"
+                        autocomplete="name" required>
+
+                </div>
+
+                <!-- EMAIL -->
+
+                <div class="professor-campo">
+
+                    <label for="emailProfessor">
+                        E-mail
+                    </label>
+
+                    <input type="email" id="emailProfessor" name="email" placeholder="exemplo@email.com"
+                        autocomplete="email" required>
+
+                </div>
+
+                <!-- DIPLOMA -->
+
+                <div class="professor-campo">
+
+                    <label for="diplomaProfessor">
+                        Diploma de Literatura
+                    </label>
+
+                    <div class="professor-upload">
+
+                        <span class="professor-upload-icone">
+                            📄
+                        </span>
+
+                        <strong>
+                            Envie seu diploma
+                        </strong>
+
+                        <p>
+                            Selecione o arquivo que comprova
+                            sua formação em Literatura.
+                        </p>
+
+                        <input type="file" id="diplomaProfessor" name="diploma" accept=".pdf,.jpg,.jpeg,.png" required>
+
+                        <small>
+                            Formatos aceitos: PDF, JPG e PNG.
+                            Tamanho máximo: 5 MB.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- SENHA -->
+
+                <div class="professor-campo">
+
+                    <label for="senhaProfessor">
+                        Senha
+                    </label>
+
+                    <input type="password" id="senhaProfessor" name="senha" placeholder="Crie uma senha"
+                        autocomplete="new-password" minlength="8" required>
+
+                </div>
+
+                <!-- CONFIRMAR SENHA -->
+
+                <div class="professor-campo">
+
+                    <label for="confirmarSenhaProfessor">
+                        Confirmar senha
+                    </label>
+
+                    <input type="password" id="confirmarSenhaProfessor" name="confirmar_senha"
+                        placeholder="Digite a senha novamente" autocomplete="new-password" minlength="8" required>
+
+                </div>
+
+                <!-- MENSAGEM -->
+
+                <p id="mensagemCadastroProfessor" class="professor-mensagem" role="status" aria-live="polite"></p>
+
+                <!-- BOTÃO -->
+
+
+                <button type="submit"
+        class="professor-botao"
+        id="btnCadastrarProfessor">
+    Cadastrar
+</button>
+
+
+            </form>
+
+            <div class="professor-login">
+
+                Já possui uma conta?
+
+                <a href="login-professor.html">
+                    Entrar como professor
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- PAINEL LATERAL -->
+
+        <aside class="professor-lateral">
+
+            <div class="professor-lateral-conteudo">
+
+                
+<div class="professor-mascote">
+    <img
+        src="img/professor.png"
+        alt="Mascote BRIO segurando um coração roxo"
+    >
+</div>
+
+
+                <h2>
+                    Ensinar também é transformar.
+                </h2>
+
+                <p>
+                    Compartilhe seus conhecimentos,
+                    acompanhe o desenvolvimento dos
+                    alunos e faça parte da comunidade BRIO.
+                </p>
+
+                <div class="professor-lateral-frase">
+                    ✨ Seu conhecimento inspira futuros!
+                </div>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+    
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const formulario = document.getElementById("formCadastroProfessor");
+    const mensagem = document.getElementById("mensagemCadastroProfessor");
+    const botao = document.getElementById("btnCadastrarProfessor");
+
+    formulario.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const senha = document.getElementById("senhaProfessor").value;
+        const confirmarSenha = document.getElementById("confirmarSenhaProfessor").value;
+        const diploma = document.getElementById("diplomaProfessor").files[0];
+
+        mensagem.textContent = "";
+        mensagem.className = "professor-mensagem";
+
+        if (senha !== confirmarSenha) {
+            mensagem.textContent = "As senhas não coincidem!";
+            mensagem.classList.add("erro");
+            return;
+        }
+
+        if (!diploma) {
+            mensagem.textContent = "Envie seu diploma!";
+            mensagem.classList.add("erro");
+            return;
+        }
+
+        const extensao = diploma.name.split(".").pop().toLowerCase();
+        const formatos = ["pdf", "jpg", "jpeg", "png"];
+
+        if (!formatos.includes(extensao)) {
+            mensagem.textContent = "Envie um arquivo PDF, JPG ou PNG.";
+            mensagem.classList.add("erro");
+            return;
+        }
+
+        if (diploma.size > 5 * 1024 * 1024) {
+            mensagem.textContent = "O arquivo deve ter no máximo 5 MB.";
+            mensagem.classList.add("erro");
+            return;
+        }
+
+        botao.disabled = true;
+        botao.textContent = "Enviando cadastro...";
+
+        try {
+
+            const dados = new FormData(formulario);
+
+            const resposta = await fetch(
+                "../backend/api.php?action=register_professor",
+                {
+                    method: "POST",
+                    body: dados,
+                    credentials: "same-origin"
+                }
+            );
+
+            const texto = await resposta.text();
+
+            let resultado;
+
+            try {
+                resultado = JSON.parse(texto);
+            } catch {
+                throw new Error(
+                    "O servidor não retornou uma resposta válida. Verifique o api.php."
+                );
+            }
+
+            if (!resposta.ok) {
+                throw new Error(
+                    resultado.erro || "Erro ao cadastrar professor."
+                );
+            }
+
+            mensagem.textContent =
+                resultado.mensagem || "Cadastro realizado com sucesso!";
+
+            mensagem.classList.add("sucesso");
+
+            
+formulario.reset();
+
+// Após cadastrar, abrir a área do professor.
+window.location.replace("professor.html");
+
+
+        } catch (erro) {
+
+            console.error("Erro no cadastro do professor:", erro);
+
+            mensagem.textContent =
+                erro.message || "Não foi possível realizar o cadastro.";
+
+            mensagem.classList.add("erro");
+
+        } finally {
+
+            botao.disabled = false;
+            botao.textContent = "Cadastrar";
+
+        }
+
+    });
+
+});
+</script>
+
+
+
+
+</body>
+
+</html>

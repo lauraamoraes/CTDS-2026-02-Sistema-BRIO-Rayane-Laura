@@ -1,3 +1,180 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Professor — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header><main class="container">
-<h1>Área do professor</h1><p class="muted">Leia as redações e registre a correção.</p><div id="lista"></div></main><script src="js/app.js"></script><script>initProfessor()</script></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Área do Professor | BRIO</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css?v=20261109-5">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body class="pagina-professor">
+
+    <header class="professor-painel-header">
+        <a href="index.html" class="professor-painel-logo">
+            BRIO<span>💜</span>
+        </a>
+
+        <span class="professor-painel-identificacao">
+            ✨ Área do professor
+        </span>
+    </header>
+
+    <main class="container professor-painel">
+        <div class="professor-boas-vindas">
+    <span>✨ SEU ESPAÇO NO BRIO</span>
+
+    <h2 id="boasVindasProfessor">
+        Bem-vindo(a)! 💜
+    </h2>
+
+    <p>Que bom ter você aqui! Vamos transformar futuros juntos.</p>
+</div>
+
+        <section class="professor-banner">
+
+            <div class="professor-banner-texto">
+
+                <span class="professor-banner-etiqueta">
+                    ✨ ESPAÇO DO EDUCADOR
+                </span>
+
+                <h1>
+                    Sua missão é transformar
+                    futuros! 💜
+                </h1>
+
+                <p>
+                    Cada redação corrigida é mais um passo
+                    na jornada de aprendizado dos nossos alunos.
+                </p>
+
+                <span class="professor-banner-destaque">
+                    📚 Seu conhecimento faz a diferença!
+                </span>
+
+            </div>
+
+            <div class="professor-banner-mascote">
+                <img
+                    src="img/prof.png"
+                    alt="Mascote BRIO com megafone"
+                >
+            </div>
+
+        </section>
+
+        <section class="professor-redacoes-secao">
+
+            <div class="professor-secao-topo">
+
+                <div>
+                    <span class="professor-secao-etiqueta">
+                        CENTRAL DE CORREÇÕES
+                    </span>
+
+                    <h2>Redações para corrigir 📝</h2>
+
+                    <p>
+                        Confira as redações pendentes
+                        e registre suas avaliações.
+                    </p>
+                </div>
+
+                <span class="professor-status">
+                    <span class="professor-status-bolinha"></span>
+                    Correções disponíveis
+                </span>
+
+            </div>
+
+            <div id="lista" class="professor-lista">
+    <p>Carregando redações...</p>
+</div>
+
+</section>
+
+<!-- =====================================
+     HISTÓRICO DO PROFESSOR
+===================================== -->
+            
+<!-- =====================================
+     HISTÓRICO DO PROFESSOR
+===================================== -->
+
+<section class="professor-historico-secao">
+
+    <div class="professor-secao-topo">
+
+        <div>
+            <span class="professor-secao-etiqueta">
+                MEU HISTÓRICO
+            </span>
+
+            <h2>Minhas correções 💜</h2>
+
+            <p>
+                Acompanhe todas as redações que você
+                já corrigiu no BRIO.
+            </p>
+        </div>
+
+        <div class="professor-total-correcoes">
+            <span>✍️ Total de correções</span>
+            <strong id="totalCorrecoesProfessor">0</strong>
+        </div>
+
+    </div>
+
+    <div id="historicoCorrecoesProfessor"
+         class="professor-historico-lista">
+
+        <p>Carregando seu histórico...</p>
+
+    </div>
+
+</section>
+
+        <br>
+<div class="dashboard-sair">
+    <button type="button" class="btn-sair-dashboard" onclick="logout()">
+        ← Sair da conta
+    </button>
+</div>
+
+
+    </main>
+    
+
+<script src="js/app.js?v=20261109-5"></script>
+    <script>
+    console.log("BRIO: iniciando página do professor");
+
+    initProfessor().catch(erro => {
+        console.error("ERRO NA INICIALIZAÇÃO DO PROFESSOR:", erro);
+
+        const lista = document.getElementById("lista");
+        const historico = document.getElementById("historicoCorrecoesProfessor");
+
+        if (lista) {
+            lista.textContent = "Erro ao carregar redações: " + erro.message;
+        }
+
+        if (historico && historico.textContent.includes("Carregando")) {
+            historico.textContent = "A inicialização falhou. Consulte o console.";
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Confirmar plano | BRIO</title>
+
+    <link rel="stylesheet" href="css/style.css?v=20261104">
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fffaf7;
+            color: #4c3b48;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topo {
+            padding: 22px 32px;
+            background: #efe7f7;
+            border-bottom: 1px solid #e2d9e8;
+        }
+
+        .topo h1 {
+            margin: 0;
+            color: #5b3f88;
+            font-size: 25px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .painel {
+            padding: 35px;
+            background: #fff;
+            border: 1px solid #e2d9e8;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(70, 45, 85, .08);
+        }
+
+        .titulo-secao {
+            margin: 0 0 20px;
+            color: #5b3f88;
+            font-size: 22px;
+        }
+
+        .resumo-plano {
+            padding: 24px;
+            margin-bottom: 30px;
+            background: #efe7f7;
+            border-radius: 15px;
+        }
+
+        .resumo-plano h2 {
+            margin: 0 0 15px;
+            color: #5b3f88;
+            font-size: 25px;
+        }
+
+        .preco {
+            margin: 10px 0;
+            color: #5b3f88;
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        .preco small {
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .descricao {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .campo {
+            margin-bottom: 20px;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .campo input,
+        .campo select {
+            display: block;
+            width: 100%;
+            min-height: 46px;
+            padding: 12px;
+            border: 1px solid #ded8e1;
+            border-radius: 9px;
+            background: #fff;
+            color: #302a33;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+        .campo input:focus,
+        .campo select:focus {
+            outline: none;
+            border-color: #5b3f88;
+            box-shadow: 0 0 0 3px rgba(91, 63, 136, .12);
+        }
+
+        .grade-campos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .secao-pagamento {
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid #e2d9e8;
+            border-radius: 14px;
+        }
+
+        .secao-pagamento h3 {
+            margin: 0 0 15px;
+            color: #5b3f88;
+            font-size: 20px;
+        }
+
+        .secao-pagamento[hidden] {
+            display: none;
+        }
+
+        .ajuda {
+            color: #796d80;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .aviso {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            background: #fff7e6;
+            color: #795719;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .mensagem {
+            display: none;
+            padding: 13px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: #fde8e7;
+            color: #b42318;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .mensagem.sucesso {
+            background: #e1f8e5;
+            color: #28643a;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            min-height: 48px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #5b3f88;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .btn:hover {
+            background: #4c3374;
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .voltar {
+            display: inline-block;
+            margin-top: 20px;
+            color: #5b3f88;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .voltar:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .topo {
+                padding: 20px;
+            }
+
+            .topo h1 {
+                font-size: 21px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 0 12px;
+            }
+
+            .painel {
+                padding: 22px 18px;
+            }
+
+            .resumo-plano {
+                padding: 18px;
+            }
+
+            .preco {
+                font-size: 32px;
+            }
+
+            .grade-campos {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .secao-pagamento {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header></header>
+
+    <section class="topo">
+        <h1 id="tituloConfirmacao">Finalize seu pagamento</h1>
+    </section>
+
+    <main class="container">
+
+        <section class="painel">
+
+            <!-- RESUMO DO PLANO -->
+            <div class="resumo-plano">
+
+                <h2 id="nomePlano">Carregando plano...</h2>
+
+                <div class="preco" id="precoPlano">
+                    R$ 0,00
+                </div>
+
+                <p class="descricao" id="descricaoPlano"></p>
+
+                <p id="duracaoPlano"></p>
+
+            </div>
+
+            <!-- MENSAGENS DE ERRO E SUCESSO -->
+            <div
+                id="mensagem"
+                class="mensagem"
+                role="alert"
+                aria-live="polite">
+            </div>
+
+            <!-- FORMA DE PAGAMENTO -->
+            <h2 class="titulo-secao">Dados de pagamento</h2>
+
+            <div class="campo">
+
+                <label for="formaPagamento">
+                    Escolha a forma de pagamento
+                </label>
+
+                <select id="formaPagamento">
+
+                    <option value="Pix">
+                        Pix
+                    </option>
+
+                    <option value="Cartão de crédito">
+                        Cartão de crédito
+                    </option>
+
+                    <option value="Boleto">
+                        Boleto bancário
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- PAGAMENTO POR PIX -->
+            <section
+                id="dadosPix"
+                class="secao-pagamento">
+
+                <h3>Pagamento via Pix</h3>
+
+                <p class="ajuda">
+                    Ao finalizar, o sistema registrará uma contratação
+                    simulada para fins acadêmicos.
+                </p>
+
+                <p class="ajuda">
+                    Nenhum código Pix será gerado e nenhuma cobrança real
+                    será realizada.
+                </p>
+
+            </section>
+
+            <!-- PAGAMENTO POR CARTÃO -->
+            <section
+                id="dadosCartao"
+                class="secao-pagamento"
+                hidden>
+
+                <h3>Dados do cartão de crédito</h3>
+
+                <div class="campo">
+
+                    <label for="nomeCartao">
+                        Nome impresso no cartão
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nomeCartao"
+                        autocomplete="off"
+                        placeholder="Nome do titular">
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="numeroCartao">
+                        Número do cartão
+                    </label>
+
+                    <input
+                        type="text"
+                        id="numeroCartao"
+                        inputmode="numeric"
+                        maxlength="19"
+                        autocomplete="off"
+                        placeholder="0000 0000 0000 0000">
+
+                </div>
+
+                <div class="grade-campos">
+
+                    <div class="campo">
+
+                        <label for="validadeCartao">
+                            Validade
+                        </label>
+
+                        <input
+                            type="text"
+                            id="validadeCartao"
+                            inputmode="numeric"
+                            maxlength="5"
+                            autocomplete="off"
+                            placeholder="MM/AA">
+
+                    </div>
+
+                    <div class="campo">
+
+                        <label for="cvvCartao">
+                            Código de segurança
+                        </label>
+
+                        <input
+                            type="password"
+                            id="cvvCartao"
+                            inputmode="numeric"
+                            maxlength="4"
+                            autocomplete="off"
+                            placeholder="123">
+
+                    </div>
+
+                </div>
+
+                <p class="ajuda">
+                    Utilize apenas dados fictícios para demonstrar
+                    a funcionalidade no seu TCC.
+                </p>
+
+            </section>
+
+            <!-- PAGAMENTO POR BOLETO -->
+            <section
+                id="dadosBoleto"
+                class="secao-pagamento"
+                hidden>
+
+                <h3>Boleto bancário</h3>
+
+                <p class="ajuda">
+                    Ao finalizar, será registrada uma simulação
+                    de contratação por boleto.
+                </p>
+
+                <p class="ajuda">
+                    Este protótipo não emite boletos válidos
+                    para pagamento.
+                </p>
+
+            </section>
+
+            <!-- BOTÃO DE FINALIZAÇÃO -->
+            <button
+                type="button"
+                class="btn"
+                id="finalizar"
+                disabled>
+
+                Finalizar
+
+            </button>
+
+            <a href="planos.html" class="voltar">
+                ← Voltar para os planos
+            </a>
+
+        </section>
+
+    </main>
+
+    <script src="js/app.js?v=20261103"></script>
+
+    <script>
+        let planoSelecionado = null;
+
+        /*
+         * Exibe mensagens na tela.
+         */
+        function mostrarMensagem(texto, sucesso = false) {
+            const elemento = document.getElementById('mensagem');
+
+            elemento.textContent = texto;
+            elemento.className = sucesso
+                ? 'mensagem sucesso'
+                : 'mensagem';
+
+            elemento.style.display = 'block';
+        }
+
+        /*
+         * Esconde a mensagem anterior.
+         */
+        function limparMensagem() {
+            const elemento = document.getElementById('mensagem');
+
+            elemento.textContent = '';
+            elemento.style.display = 'none';
+            elemento.className = 'mensagem';
+        }
+
+        /*
+         * Carrega os dados do plano selecionado na página anterior.
+         */
+        function carregarPlano() {
+            const salvo = sessionStorage.getItem('planoEscolhido');
+
+            if (!salvo) {
+                document.getElementById('nomePlano').textContent =
+                    'Nenhum plano selecionado';
+
+                document.getElementById('precoPlano').textContent = '';
+
+                document.getElementById('descricaoPlano').textContent =
+                    'Volte para a página de planos e escolha uma opção.';
+
+                document.getElementById('duracaoPlano').textContent = '';
+
+                mostrarMensagem(
+                    'Você precisa selecionar um plano antes de continuar.'
+                );
+
+                document.getElementById('finalizar').disabled = true;
+
+                return;
+            }
+
+            try {
+                planoSelecionado = JSON.parse(salvo);
+
+                const nome = String(planoSelecionado.nome || 'Plano');
+
+                const valor = Number(planoSelecionado.valor_mensal);
+
+                const meses =
+                    Number(planoSelecionado.periodo_meses) || 1;
+
+                if (
+                    !planoSelecionado.id ||
+                    !Number.isFinite(valor) ||
+                    valor < 0 ||
+                    !Number.isInteger(meses) ||
+                    meses < 1
+                ) {
+                    throw new Error('Os dados do plano são inválidos.');
+                }
+
+                const precoFormatado = valor.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                document.getElementById('tituloConfirmacao').textContent =
+                    'Finalize sua contratação';
+
+                document.getElementById('nomePlano').textContent =
+                    'Plano ' + nome;
+
+                document.getElementById('precoPlano').textContent =
+                    'R$ ' + precoFormatado + '/mês';
+
+                document.getElementById('descricaoPlano').textContent =
+                    planoSelecionado.descricao || '';
+
+                document.getElementById('duracaoPlano').textContent =
+                    'Duração: ' + meses +
+                    (meses === 1 ? ' mês' : ' meses');
+
+                document.getElementById('finalizar').disabled = false;
+
+            } catch (erro) {
+                console.error(erro);
+
+                planoSelecionado = null;
+
+                mostrarMensagem(
+                    'Não foi possível carregar os dados do plano. ' +
+                    'Volte à página anterior e escolha novamente.'
+                );
+
+                document.getElementById('finalizar').disabled = true;
+            }
+        }
+
+        /*
+         * Atualiza os campos de acordo com a forma de pagamento.
+         */
+        function atualizarFormaPagamento() {
+            const forma =
+                document.getElementById('formaPagamento').value;
+
+            document.getElementById('dadosPix').hidden =
+                forma !== 'Pix';
+
+            document.getElementById('dadosCartao').hidden =
+                forma !== 'Cartão de crédito';
+
+            document.getElementById('dadosBoleto').hidden =
+                forma !== 'Boleto';
+
+            limparMensagem();
+        }
+
+        /*
+         * Valida os dados fictícios do cartão.
+         */
+        function validarDadosPagamento() {
+            const forma =
+                document.getElementById('formaPagamento').value;
+
+            if (forma !== 'Cartão de crédito') {
+                return true;
+            }
+
+            const nome =
+                document.getElementById('nomeCartao').value.trim();
+
+            const numero =
+                document.getElementById('numeroCartao')
+                    .value.replace(/\D/g, '');
+
+            const validade =
+                document.getElementById('validadeCartao')
+                    .value.trim();
+
+            const cvv =
+                document.getElementById('cvvCartao')
+                    .value.replace(/\D/g, '');
+
+            if (nome.length < 3) {
+                mostrarMensagem(
+                    'Informe um nome fictício válido para o titular.'
+                );
+
+                return false;
+            }
+
+            if (numero.length < 13 || numero.length > 19) {
+                mostrarMensagem(
+                    'Informe um número de cartão de teste com ' +
+                    '13 a 19 dígitos.'
+                );
+
+                return false;
+            }
+
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(validade)) {
+                mostrarMensagem(
+                    'Informe a validade no formato MM/AA.'
+                );
+
+                return false;
+            }
+
+            if (cvv.length < 3 || cvv.length > 4) {
+                mostrarMensagem(
+                    'Informe um código de segurança fictício com ' +
+                    '3 ou 4 dígitos.'
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+        /*
+         * Finaliza a contratação simulada.
+         */
+        async function finalizarEscolha() {
+            limparMensagem();
+
+            if (!planoSelecionado) {
+                mostrarMensagem(
+                    'Selecione um plano antes de continuar.'
+                );
+
+                return;
+            }
+
+            if (!validarDadosPagamento()) {
+                return;
+            }
+
+            if (typeof api !== 'function') {
+                mostrarMensagem(
+                    'Não foi possível conectar à API da plataforma.'
+                );
+
+                return;
+            }
+
+            const botao = document.getElementById('finalizar');
+
+            const formaPagamento =
+                document.getElementById('formaPagamento').value;
+
+            botao.disabled = true;
+            botao.textContent = 'Processando...';
+
+            try {
+                /*
+                 * Envia somente os dados necessários para a API.
+                 * Os campos do cartão não são enviados nem armazenados.
+                 */
+                const resposta = await api('assinar', {
+                    method: 'POST',
+
+                    body: JSON.stringify({
+                        plano_id: Number(planoSelecionado.id),
+                        forma_pagamento: formaPagamento
+                    })
+                });
+
+                sessionStorage.removeItem('planoEscolhido');
+
+                mostrarMensagem(
+                    resposta && resposta.mensagem
+                        ? resposta.mensagem
+                        : 'Contratação concluída!',
+                    true
+                );
+
+                botao.textContent = 'Contratação concluída';
+
+                alert(
+                    'Simulação concluída com sucesso! ' +
+                    'Seu plano foi processado pelo sistema. ' +
+                    'Nenhuma cobrança real foi realizada.'
+                );
+
+                window.location.href = 'dashboard.html';
+
+            } catch (erro) {
+                console.error(erro);
+
+                mostrarMensagem(
+                    erro.message ||
+                    'Não foi possível concluir a simulação. ' +
+                    'Verifique a conexão com o servidor e tente novamente.'
+                );
+
+                botao.disabled = false;
+                botao.textContent = 'Finalizar simulação';
+            }
+        }
+
+        /*
+         * Inicializa a página.
+         */
+        async function iniciarPagina() {
+            try {
+                if (typeof requireUser === 'function') {
+                    const usuario = await requireUser();
+
+                    if (!usuario) {
+                        return;
+                    }
+                }
+
+                if (typeof header === 'function') {
+                    header();
+                }
+
+                carregarPlano();
+
+                document
+                    .getElementById('formaPagamento')
+                    .addEventListener(
+                        'change',
+                        atualizarFormaPagamento
+                    );
+
+                document
+                    .getElementById('finalizar')
+                    .addEventListener(
+                        'click',
+                        finalizarEscolha
+                    );
+
+                atualizarFormaPagamento();
+
+            } catch (erro) {
+                console.error(erro);
+
+                mostrarMensagem(
+                    'Ocorreu um erro ao abrir a página. ' +
+                    'Tente novamente.'
+                );
+            }
+        }
+
+        iniciarPagina();
+    </script>
+
+</body>
+</html>

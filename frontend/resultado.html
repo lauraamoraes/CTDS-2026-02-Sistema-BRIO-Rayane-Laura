@@ -1,4 +1,86 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Resultado — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header><main class="container">
-<h1>Resultado</h1><div id="resultado"></div><h2 class="section-title">Gabarito comentado</h2><div id="gabarito" class="grid"></div></main>
-<script src="js/app.js"></script><script>initResultado()</script></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Resultado — BRIO</title>
+
+    <link rel="stylesheet" href="css/style.css?v=20261105">
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body>
+
+    <header></header>
+
+    <main class="container pagina-resultado">
+
+        <div class="resultado-cabecalho">
+            <span class="resultado-etiqueta">SEU DESEMPENHO</span>
+            <h1>Resultado</h1>
+            <p>Veja como foi seu desempenho e continue evoluindo!</p>
+        </div>
+
+        <section class="resultado-layout">
+
+            <div id="resultado"></div>
+
+            <aside class="mascote-area">
+
+                <div class="mascote-ilustracao">
+                    <img src="img/mascote1.png" alt="Mascote oficial do BRIO">
+                </div>
+
+                <h3>Você está evoluindo!</h3>
+
+                <p>
+                    Cada questão é uma oportunidade
+                    de aprender algo novo.
+                    Continue dando o seu melhor!
+                </p>
+
+                <div class="mascote-detalhe">
+                    ✨ Um passo de cada vez!
+                </div>
+
+            </aside>
+
+        </section>
+
+        <section class="gabarito-secao">
+
+            <div class="gabarito-cabecalho">
+                <div>
+                    <span class="resultado-etiqueta">
+                        REVISÃO DO SIMULADO
+                    </span>
+
+                    <h2>Gabarito comentado</h2>
+
+                    <p>
+                        Confira suas respostas e entenda cada questão.
+                    </p>
+                </div>
+            </div>
+
+            <div id="gabarito" class="grid"></div>
+            <a href="dashboard.html" class="btn-voltar">
+        ← Voltar para a página inicial
+    </a>
+        </section>
+
+    </main>
+
+    <script src="js/app.js?v=20261105"></script>
+    <script>
+        initResultado();
+    </script>
+    <div class="resultado-voltar">
+</div>
+
+</body>
+</html>

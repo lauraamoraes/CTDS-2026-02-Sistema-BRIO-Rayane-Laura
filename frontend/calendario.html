@@ -1,10 +1,74 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Calendário — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header><main class="container">
-<h1>Calendário e rotina</h1><div class="two"><div class="card"><h2>Nova atividade</h2>
-<div class="field"><label>Título</label><input id="titulo"></div><div class="field"><label>Descrição</label><input id="descricao"></div>
-<div class="field"><label>Data</label><input id="data" type="date"></div><div class="field"><label>Horário</label><input id="horario" type="time"></div>
-<div class="field"><label>Duração (minutos)</label><input id="duracao" type="number" value="50"></div>
-<div class="field"><label>Tipo</label><select id="tipo"><option value="estudo">Estudo</option><option value="simulado">Simulado</option><option value="redacao">Redação</option><option value="outro">Outro</option></select></div>
-<button id="salvar" class="btn green">Adicionar</button></div>
-<div><h2>Minhas atividades</h2><div id="tarefas"></div></div></div></main>
-<script src="js/app.js"></script><script>initCalendario()</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Calendário — BRIO</title>
+    <link rel="stylesheet" href="css/style.css?v=20261103">
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body>
+    <header></header>
+    <main class="container">
+
+        <div class="calendario-cabecalho">
+
+            <div class="calendario-apresentacao">
+                <span class="badge">ÁREA DE CALENDÁRIO</span>
+                <span class="calendario-etiqueta">
+                    ORGANIZE SEUS ESTUDOS
+                </span>
+
+                <h1>Calendário e rotina 💜</h1>
+
+                <p>
+                    Planeje suas atividades, organize seus horários
+                    e mantenha o foco nos seus objetivos!
+                </p>
+
+            </div>
+
+            <img src="img/calendario.png" alt="Mascote BRIO com calendário de atividades" class="calendario-mascote">
+
+        </div>
+
+        <div class="two">
+            <div class="card">
+                <h2>Nova atividade</h2>
+                <div class="field"><label>Título</label><input id="titulo"></div>
+                <div class="field"><label>Descrição</label><input id="descricao"></div>
+                <div class="field"><label>Data</label><input id="data" type="date"></div>
+                <div class="field"><label>Horário</label><input id="horario" type="time"></div>
+                <div class="field"><label>Duração (minutos)</label><input id="duracao" type="number" value="50"></div>
+                <div class="field"><label>Tipo</label><select id="tipo">
+                        <option value="estudo">Estudo</option>
+                        <option value="simulado">Simulado</option>
+                        <option value="redacao">Redação</option>
+                        <option value="outro">Outro</option>
+                    </select></div>
+                <button id="salvar" class="btn green">Adicionar</button>
+            </div>
+            <div>
+                <h2>Minhas atividades</h2>
+                <div id="tarefas"></div>
+            </div>
+        </div>
+
+        <div class="calendario-rodape">
+            <a href="dashboard.html" class="voltar">
+                ← Voltar
+            </a>
+        </div>
+
+    </main>
+    <script src="js/app.js?v=20261103"></script>
+
+    <script>
+        initCalendario();
+    </script>
+</body>
+
+</html>

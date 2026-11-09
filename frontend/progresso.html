@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu Progresso — BRIO</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fffaf8;
+            font-family: Arial, sans-serif;
+            color: #49364d;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 0 50px;
+        }
+
+
+        /* =========================
+           TOPO
+        ========================= */
+
+        .topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .voltar {
+            color: #68428a;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .topo h1 {
+            margin: 12px 0 5px;
+            font-size: 34px;
+            color: #49364d;
+        }
+
+        .topo p {
+            margin: 0;
+            color: #806b83;
+            font-size: 16px;
+        }
+
+        .mascote-topo {
+            font-size: 65px;
+        }
+
+
+        /* =========================
+           MENSAGEM DO MASCOTE
+        ========================= */
+
+        .mensagem-mascote {
+            background: #f1e9fa;
+            border: 1px solid #dfd0ee;
+            border-radius: 22px;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .mascote {
+            background: white;
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            flex-shrink: 0;
+        }
+
+        .fala h2 {
+            margin: 0 0 8px;
+            color: #56366f;
+            font-size: 21px;
+        }
+
+        .fala p {
+            margin: 0;
+            line-height: 1.5;
+            color: #715f76;
+        }
+
+
+        /* =========================
+           PROGRESSO GERAL
+        ========================= */
+
+        .progresso-geral {
+            background: white;
+            border: 1px solid #dfd6e4;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(80, 50, 90, 0.06);
+        }
+
+        .titulo-secao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .titulo-secao h2 {
+            margin: 0 0 5px;
+            color: #49364d;
+        }
+
+        .titulo-secao p {
+            margin: 0;
+            color: #88768b;
+        }
+
+        #porcentagem {
+            font-size: 27px;
+            font-weight: bold;
+            color: #68428a;
+        }
+
+        .barra-fundo {
+            height: 20px;
+            background: #eee7f2;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 25px;
+        }
+
+        .barra-progresso {
+            height: 100%;
+            width: 0%;
+            background: #a987bd;
+            border-radius: 20px;
+            transition: width 0.8s ease;
+        }
+
+        .progresso-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #806b83;
+        }
+
+        .nivel {
+            margin-top: 20px;
+            padding: 17px;
+            background: #faf7fc;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nivel-pequeno {
+            display: block;
+            font-size: 11px;
+            color: #927f97;
+            margin-bottom: 3px;
+        }
+
+        .nivel strong {
+            color: #593b6d;
+        }
+
+        .proximo-nivel {
+            color: #88768b;
+        }
+
+
+        /* =========================
+           ESTATÍSTICAS
+        ========================= */
+
+        .titulo {
+            margin: 0 0 15px;
+            color: #49364d;
+        }
+
+        .estatisticas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .estatistica {
+            background: white;
+            border: 1px solid #dfd6e4;
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 7px 20px rgba(80, 50, 90, 0.05);
+        }
+
+        .icone {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: #f1e9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+
+        .estatistica h3 {
+            margin: 0 0 4px;
+            font-size: 24px;
+            color: #57376e;
+        }
+
+        .estatistica p {
+            margin: 0;
+            color: #806f85;
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           CONQUISTAS
+        ========================= */
+
+        .conquistas {
+            background: white;
+            border: 1px solid #dfd6e4;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .conquistas-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .conquista {
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 1px solid #e3d9e8;
+        }
+
+        .conquista-icone {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: #f2eafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            flex-shrink: 0;
+        }
+
+        .conquista h3 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            color: #57376e;
+        }
+
+        .conquista p {
+            margin: 0;
+            font-size: 13px;
+            color: #857488;
+        }
+
+        .check {
+            margin-left: auto;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e5f3e9;
+            color: #5c9a70;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .cadeado {
+            margin-left: auto;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0edf2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            opacity: 0.8;
+            flex-shrink: 0;
+        }
+
+        .desbloqueada {
+            background: #ffffff;
+        }
+
+        .bloqueada {
+            opacity: 0.55;
+            background: #fafafa;
+        }
+
+
+        /* =========================
+           MENSAGEM FINAL
+        ========================= */
+
+        .mensagem-final {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #f7f0fb;
+            border-radius: 20px;
+            padding: 22px 28px;
+            margin-bottom: 25px;
+        }
+
+        .mascote-final {
+            font-size: 58px;
+        }
+
+        .mensagem-final h2 {
+            margin: 0 0 7px;
+            color: #57376e;
+        }
+
+        .mensagem-final p {
+            margin: 0;
+            color: #77657c;
+            line-height: 1.5;
+        }
+
+
+        /* =========================
+           BOTÕES
+        ========================= */
+
+        .botoes {
+            display: flex;
+            gap: 15px;
+        }
+
+        .botao {
+            text-decoration: none;
+            background: #79539a;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .botao:hover {
+            background: #68428a;
+            transform: translateY(-2px);
+        }
+
+
+        /* =========================
+           MENSAGEM DE ERRO
+        ========================= */
+
+        .erro {
+            background: #fce8e8;
+            border: 1px solid #efcaca;
+            color: #a34d4d;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+
+        /* =========================
+           RESPONSIVO
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .estatisticas {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .conquistas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        @media (max-width: 550px) {
+
+            .container {
+                width: 92%;
+                padding-top: 20px;
+            }
+
+            .topo h1 {
+                font-size: 28px;
+            }
+
+            .mascote-topo {
+                font-size: 45px;
+            }
+
+            .mensagem-mascote {
+                align-items: flex-start;
+                padding: 18px;
+            }
+
+            .mascote {
+                width: 65px;
+                height: 65px;
+                font-size: 38px;
+            }
+
+            .estatisticas {
+                grid-template-columns: 1fr;
+            }
+
+            .nivel {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .botoes {
+                flex-direction: column;
+            }
+
+            .botao {
+                text-align: center;
+            }
+        }
+        
+/* =====================================
+   MASCOTE DA PÁGINA DE PROGRESSO
+===================================== */
+
+/* Mascote pequeno no cabeçalho */
+
+.mascote-progresso {
+    width: 75px !important;
+    height: 75px !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Mascote dentro do círculo branco */
+
+.progresso-mascote-circulo {
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    background: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.progresso-mascote-circulo .mascote-progresso {
+    width: 85px !important;
+    height: 85px !important;
+}
+
+/* Ajuste para celular */
+
+@media (max-width: 600px) {
+    .mascote-progresso {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .progresso-mascote-circulo {
+        width: 95px;
+        height: 95px;
+    }
+
+    .progresso-mascote-circulo .mascote-progresso {
+        width: 65px !important;
+        height: 65px !important;
+    }
+}
+
+    </style>
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+
+<body>
+
+    <main class="container">
+
+        <!-- TOPO -->
+
+        <header class="topo">
+
+            <div>
+
+                <a href="dashboard.html" class="perfil-voltar">
+                ← Voltar
+            </a>
+                
+                <h1>Meu progresso</h1>
+
+                <p>
+                    Acompanhe sua evolução na BRIO e continue avançando!
+                </p>
+
+            </div>
+
+            <img
+    src="img/mascote-nivel1.png"
+    alt="Mascote do BRIO"
+    class="mascote-progresso mascote-por-nivel"
+>
+
+        </header>
+
+
+        <!-- MENSAGEM DE ERRO -->
+
+        <div id="erro" class="erro"></div>
+
+
+        <!-- MENSAGEM DO MASCOTE -->
+
+        <section class="mensagem-mascote">
+
+         
+<img
+    src="img/nivel1.png"
+    class="mascote-progresso mascote-por-nivel"
+    alt="Mascote do BRIO"
+>
+
+
+            <div class="fala">
+
+                <h2 id="mensagemTitulo">
+                    Carregando seu progresso...
+                </h2>
+
+                <p id="mensagemTexto">
+                    Estamos buscando suas informações.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PROGRESSO GERAL -->
+
+        <section class="progresso-geral">
+
+            <div class="titulo-secao">
+
+                <div>
+
+                    <h2>
+                        🌟 Seu progresso
+                    </h2>
+
+                    <p>
+                        Veja o quanto você já avançou.
+                    </p>
+
+                </div>
+
+                <span id="porcentagem">
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="barra-fundo">
+
+                <div class="barra-progresso" id="barraProgresso">
+                </div>
+
+            </div>
+
+
+            <div class="progresso-info">
+
+                <span id="xpAtual">
+                    0 XP
+                </span>
+
+                <span id="xpProximo">
+                    0 XP
+                </span>
+
+            </div>
+
+
+            <div class="nivel">
+
+                <div>
+
+                    <span class="nivel-pequeno">
+                        NÍVEL ATUAL
+                    </span>
+
+                    <strong id="nivelAtual">
+                        Nível 1
+                    </strong>
+
+                </div>
+
+
+                <div class="proximo-nivel">
+
+                    Próximo:
+                    <strong id="proximoNivel">
+                        Nível 2
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ESTATÍSTICAS -->
+
+        <section>
+
+            <h2 class="titulo">
+                📊 Suas estatísticas
+            </h2>
+
+
+            <div class="estatisticas">
+
+
+                <div class="estatistica">
+
+                    <div class="icone">
+                        📚
+                    </div>
+
+                    <div>
+
+                        <h3 id="conteudos">
+                            0
+                        </h3>
+
+                        <p>
+                            Conteúdos concluídos
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="estatistica">
+
+                    <div class="icone">
+                        📝
+                    </div>
+
+                    <div>
+
+                        <h3 id="simulados">
+                            0
+                        </h3>
+
+                        <p>
+                            Simulados realizados
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="estatistica">
+
+                    <div class="icone">
+                        ✍️
+                    </div>
+
+                    <div>
+
+                        <h3 id="redacoes">
+                            0
+                        </h3>
+
+                        <p>
+                            Redações enviadas
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="estatistica">
+
+                    <div class="icone">
+                        ✅
+                    </div>
+
+                    <div>
+
+                        <h3 id="tarefas">
+                            0
+                        </h3>
+
+                        <p>
+                            Tarefas concluídas
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="estatistica">
+
+                    <div class="icone">
+                        🔥
+                    </div>
+
+                    <div>
+
+                        <h3 id="sequencia">
+                            0
+                        </h3>
+
+                        <p>
+                            Dias de sequência
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="estatistica">
+
+                    <div class="icone">
+                        ⭐
+                    </div>
+
+                    <div>
+
+                        <h3 id="atividades">
+                            0
+                        </h3>
+
+                        <p>
+                            Atividades realizadas
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CONQUISTAS -->
+
+        <section class="conquistas">
+
+            <div class="titulo-secao">
+
+                <div>
+
+                    <h2>
+                        🏆 Suas conquistas
+                    </h2>
+
+                    <p>
+                        Complete atividades para desbloquear novas conquistas!
+                    </p>
+
+                </div>
+
+                <span id="totalConquistas">
+                    0/8
+                </span>
+
+            </div>
+
+
+            <div class="conquistas-grid" id="conquistasLista">
+
+            </div>
+
+        </section>
+
+
+        <!-- MENSAGEM FINAL -->
+
+        <section class="mensagem-final">
+
+            <img
+    src="img/progresso.png"
+    alt="Mascote BRIO comemorando uma conquista"
+    class="mascote-progresso"
+>
+
+            <div>
+
+                <h2>
+                    Não pare agora! 🚀
+                </h2>
+
+                <p id="mensagemFinal">
+                    Continue avançando no seu ritmo e conquiste seus próximos objetivos!
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- BOTÕES -->
+
+        <div class="botoes">
+
+            <a href="conteudos.html" class="botao">
+                📚 Estudar conteúdos
+            </a>
+
+            <a href="simulados.html" class="botao">
+                📝 Fazer um simulado
+            </a>
+
+        </div>
+
+    </main>
+
+    <script src="js/app.js?v=20261103"></script>
+    <script>
+
+        // ==========================================
+        // CARREGAR DADOS REAIS DO ALUNO
+        // ==========================================
+
+        async function carregarProgresso() {
+
+            const permitido = await requirePaidPlan();
+
+            if (!permitido) return;
+
+            try {
+
+                const resposta = await fetch(
+                    "../backend/api.php?action=progresso_dados",
+                    {
+                        method: "GET",
+                        credentials: "same-origin"
+                    }
+                );
+
+
+                const dados = await resposta.json();
+
+
+                if (!resposta.ok) {
+
+                    throw new Error(
+                        dados.message || "Não foi possível carregar o progresso."
+                    );
+
+                }
+
+
+                // ==========================================
+                // DADOS GERAIS
+                // ==========================================
+
+                const xp = Number(dados.xp) || 0;
+
+                const nivel = Number(dados.nivel) || 1;
+
+                const conteudos = Number(dados.conteudos) || 0;
+
+                const simulados = Number(dados.simulados) || 0;
+
+                const redacoes = Number(dados.redacoes) || 0;
+
+                const tarefas = Number(dados.tarefas) || 0;
+
+                const sequencia = Number(dados.sequencia) || 0;
+
+                const atividades = Number(dados.atividades) || 0;
+
+
+                // ==========================================
+                // XP E NÍVEL
+                // ==========================================
+
+                /*
+                    Cada nível possui 250 XP.
+                    O XP mostrado na barra é o XP
+                    acumulado dentro do nível atual.
+                */
+
+                const xpPorNivel = 250;
+
+                const xpDoNivelAtual = xp % xpPorNivel;
+
+                let porcentagem =
+                    Math.round(
+                        (xpDoNivelAtual / xpPorNivel) * 100
+                    );
+
+
+                if (porcentagem > 100) {
+                    porcentagem = 100;
+                }
+
+
+                // ==========================================
+                // MOSTRAR XP
+                // ==========================================
+
+                document.getElementById("xpAtual").textContent =
+                    xp + " XP";
+
+
+                document.getElementById("xpProximo").textContent =
+                    xpPorNivel + " XP";
+
+
+                // ==========================================
+                // MOSTRAR NÍVEL
+                // ==========================================
+
+                document.getElementById("nivelAtual").textContent =
+                    "Nível " + nivel;
+
+
+                document.getElementById("proximoNivel").textContent =
+                    "Nível " + (nivel + 1);
+
+
+                // ==========================================
+                // BARRA DE PROGRESSO
+                // ==========================================
+
+                document.getElementById("barraProgresso").style.width =
+                    porcentagem + "%";
+
+
+                document.getElementById("porcentagem").textContent =
+                    porcentagem + "%";
+
+
+                // ==========================================
+                // ESTATÍSTICAS
+                // ==========================================
+
+                document.getElementById("conteudos").textContent =
+                    conteudos;
+
+
+                document.getElementById("simulados").textContent =
+                    simulados;
+
+
+                document.getElementById("redacoes").textContent =
+                    redacoes;
+
+
+                document.getElementById("tarefas").textContent =
+                    tarefas;
+
+
+                document.getElementById("sequencia").textContent =
+                    sequencia;
+
+
+                document.getElementById("atividades").textContent =
+                    atividades;
+
+
+                // ==========================================
+                // MENSAGEM DO MASCOTE
+                // ==========================================
+
+                const mensagemTitulo =
+                    document.getElementById("mensagemTitulo");
+
+                const mensagemTexto =
+                    document.getElementById("mensagemTexto");
+
+                const mensagemFinal =
+                    document.getElementById("mensagemFinal");
+
+
+                if (sequencia >= 7 && xp >= 500) {
+
+                    mensagemTitulo.textContent =
+                        "Uau! Você está voando! 🚀";
+
+                    mensagemTexto.textContent =
+                        "Você já conquistou bastante XP e está mantendo uma ótima sequência. Continue assim para chegar ao próximo nível!";
+
+                    mensagemFinal.textContent =
+                        "Seu esforço está fazendo diferença. Continue avançando para desbloquear novas conquistas!";
+
+                }
+
+                else if (sequencia >= 3) {
+
+                    mensagemTitulo.textContent =
+                        "Você está criando um ótimo ritmo! 🔥";
+
+                    mensagemTexto.textContent =
+                        "Continue estudando um pouco todos os dias. Manter uma sequência ajuda você a não perder o ritmo!";
+
+                    mensagemFinal.textContent =
+                        "Você já começou sua sequência. Agora é só continuar!";
+
+                }
+
+                else if (atividades >= 10) {
+
+                    mensagemTitulo.textContent =
+                        "Você já avançou bastante! 💜";
+
+                    mensagemTexto.textContent =
+                        "Cada conteúdo, tarefa e simulado conta para sua evolução. Continue dando um passo de cada vez!";
+
+                    mensagemFinal.textContent =
+                        "Você já fez bastante coisa. Continue avançando no seu ritmo!";
+
+                }
+
+                else {
+
+                    mensagemTitulo.textContent =
+                        "Vamos começar? 🐣";
+
+                    mensagemTexto.textContent =
+                        "Faça sua primeira atividade e comece a construir seu progresso na BRIO!";
+
+                    mensagemFinal.textContent =
+                        "Toda jornada começa com o primeiro passo. Vamos juntos!";
+
+                }
+
+
+                // ==========================================
+                // CONQUISTAS
+                // ==========================================
+
+                mostrarConquistas(dados.conquistas || []);
+
+            }
+
+            catch (erro) {
+
+                console.error(erro);
+
+                const caixaErro =
+                    document.getElementById("erro");
+
+                caixaErro.style.display = "block";
+
+                caixaErro.textContent =
+                    "Erro ao carregar seu progresso: " +
+                    erro.message;
+
+            }
+
+        }
+
+
+        // ==========================================
+        // MOSTRAR CONQUISTAS
+        // ==========================================
+
+        function mostrarConquistas(conquistas) {
+
+            const lista =
+                document.getElementById("conquistasLista");
+
+
+            lista.innerHTML = "";
+
+
+            let totalDesbloqueadas = 0;
+
+
+            conquistas.forEach(function (conquista) {
+
+                const desbloqueada =
+                    Boolean(conquista.desbloqueada);
+
+
+                if (desbloqueada) {
+
+                    totalDesbloqueadas++;
+
+                }
+
+
+                const div =
+                    document.createElement("div");
+
+
+                if (desbloqueada) {
+
+                    div.className =
+                        "conquista desbloqueada";
+
+                }
+
+                else {
+
+                    div.className =
+                        "conquista bloqueada";
+
+                }
+
+
+                // Ícone da conquista
+
+                const icone =
+                    document.createElement("div");
+
+                icone.className =
+                    "conquista-icone";
+
+                icone.textContent =
+                    conquista.icone || "🏆";
+
+
+                // Área de texto
+
+                const texto =
+                    document.createElement("div");
+
+
+                const titulo =
+                    document.createElement("h3");
+
+                titulo.textContent =
+                    conquista.nome;
+
+
+                const descricao =
+                    document.createElement("p");
+
+                descricao.textContent =
+                    conquista.descricao;
+
+
+                texto.appendChild(titulo);
+
+                texto.appendChild(descricao);
+
+
+                // Ícone de status
+
+                const status =
+                    document.createElement("div");
+
+
+                if (desbloqueada) {
+
+                    status.className = "check";
+
+                    status.textContent = "✓";
+
+                }
+
+                else {
+
+                    status.className = "cadeado";
+
+                    status.textContent = "🔒";
+
+                }
+
+
+                // Montar conquista
+
+                div.appendChild(icone);
+
+                div.appendChild(texto);
+
+                div.appendChild(status);
+
+
+                lista.appendChild(div);
+
+            });
+
+
+            // Mostrar total
+
+            document.getElementById("totalConquistas").textContent =
+                totalDesbloqueadas + "/8";
+
+        }
+
+
+        // ==========================================
+        // INICIAR
+        // ==========================================
+
+        async function iniciarPaginaProgresso() {
+
+            const permitido = await requirePaidPlan();
+
+            if (!permitido) return;
+
+            carregarProgresso();
+        }
+
+        iniciarPaginaProgresso();
+
+    </script>
+
+</body>
+
+</html>

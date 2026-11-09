@@ -1,3 +1,690 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Conteúdos — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header><main class="container">
-<h1>Conteúdos</h1><p class="muted">Estude, avance e registre seu progresso.</p><div id="lista" class="grid"></div></main><script src="js/app.js"></script><script>initConteudos()</script></body></html>
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Conteúdos — BRIO</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .materias-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin: 30px 0;
+            max-width: 900px;
+        }
+
+        .materia-card {
+            width: 100%;
+            min-height: 105px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e7dff0;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(70,45,85,.08);
+            cursor: pointer;
+            text-align: left;
+            color: inherit;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+        }
+
+        .materia-card:hover {
+            transform: translateY(-3px);
+            border-color: #b9a0cc;
+            box-shadow: 0 10px 25px rgba(70,45,85,.14);
+        }
+
+        .materia-icone {
+            width: 58px;
+            height: 58px;
+            min-width: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0e8f7;
+            border-radius: 16px;
+            font-size: 29px;
+        }
+
+        .materia-info {
+            flex: 1;
+        }
+
+        .materia-info h3 {
+            margin: 0 0 6px;
+            color: #4d3b55;
+            font-size: 18px;
+        }
+
+        .materia-info p {
+            margin: 0;
+            color: #817784;
+            font-size: 14px;
+        }
+
+        .materia-seta {
+            font-size: 24px;
+            color: #765786;
+        }
+
+        #conteudos-materia,
+        #conteudo-completo {
+            display: none;
+        }
+
+        .voltar-materias {
+            margin-bottom: 25px;
+        }
+
+        .materia-titulo {
+            margin-bottom: 28px;
+        }
+
+        .materia-titulo h1 {
+            margin: 12px 0 6px;
+        }
+
+        .conteudo-completo-card {
+            background: #fff;
+            border: 1px solid #e7dff0;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            margin-top: 20px;
+            box-shadow: 0 5px 18px rgba(70,45,85,.08);
+        }
+
+        .conteudo-completo-card h1 {
+            color: #4d3b55;
+            margin: 12px 0 8px;
+        }
+
+        .conteudo-descricao {
+            color: #817784;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .conteudo-texto {
+            color: #4d3b55;
+            font-size: 16px;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .botoes-conteudo {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-concluido {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .checkbox-concluido input {
+            width: 20px;
+            height: 20px;
+            accent-color: #765786;
+        }
+
+        .status-progresso {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .conteudo-status {
+            font-weight: bold;
+        }
+
+        .voltar-inicio {
+            display: inline-block;
+            margin: 24px 0;
+        }
+
+        @media (max-width: 700px) {
+            .materias-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .conteudo-completo-card {
+                padding: 20px;
+            }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body class="pagina-estudos-brio">
+    <header></header>
+
+    <main class="container">
+        <br><br>
+        <a href="dashboard.html" class="perfil-voltar">
+                ← Voltar
+            </a>
+                <br>
+        <!-- ESCOLHA DA MATÉRIA -->
+        <section id="selecao-materias">
+            <span class="badge">ÁREA DE ESTUDOS</span>
+
+            <h1>Escolha uma matéria</h1>
+
+            <p class="muted">
+                Selecione uma matéria para visualizar os conteúdos disponíveis.
+            </p>
+            
+
+            <div class="materias-grid" id="lista-materias"></div>
+        </section>
+
+        <!-- CONTEÚDOS DA MATÉRIA -->
+        <section id="conteudos-materia">
+
+            <div class="materia-titulo">
+                <span class="badge" id="materia-badge"></span>
+
+                <h1 id="titulo-materia">Conteúdos</h1>
+
+                <p class="muted">
+                    Escolha um conteúdo para estudar.
+                    Sua conclusão fica salva na sua conta.
+                </p>
+            </div>
+
+            <div id="lista" class="grid"></div>
+            <BR>
+            <button
+                class="btn secondary voltar-materias"
+                type="button"
+                onclick="voltarMaterias()">
+                ← Voltar para matérias
+            </button>
+        </section>
+
+        <!-- CONTEÚDO COMPLETO -->
+        <section id="conteudo-completo">
+
+            <div class="conteudo-completo-card">
+                <span class="badge" id="conteudo-materia"></span>
+
+                <h1 id="conteudo-titulo">Conteúdo</h1>
+
+                <p
+                    class="conteudo-descricao"
+                    id="conteudo-descricao">
+                </p>
+
+                <div
+                    class="conteudo-texto"
+                    id="conteudo-texto">
+                </div>
+
+                <div class="botoes-conteudo">
+                    <label class="checkbox-concluido">
+                        <input
+                            id="checkbox-concluido"
+                            type="checkbox"
+                            onchange="salvarConclusao(this.checked)">
+
+                        <span>Já estudei este conteúdo</span>
+                    </label>
+
+                    <p
+                        id="status-progresso"
+                        class="status-progresso"
+                        role="status">
+                        Marque a caixa quando terminar de estudar.
+                    </p>
+                </div>
+            </div>
+            <br>
+            <button
+                class="btn secondary"
+                type="button"
+                onclick="voltarListaConteudos()">
+                ← Voltar para conteúdos
+            </button>
+        </section>
+
+        
+    </main>
+
+    <script src="js/app.js?v=20261103"></script>
+
+    <script>
+        const MATERIAS_PAGINA = [
+            {
+                nome: 'Língua Portuguesa',
+                aliases: ['Língua Portuguesa', 'Português'],
+                icone: '📚',
+                descricao: 'Gramática, literatura e interpretação'
+            },
+            {
+                nome: 'Língua Estrangeira (Inglês/Espanhol)',
+                aliases: [
+                    'Língua Estrangeira (Inglês/Espanhol)',
+                    'Língua Estrangeira',
+                    'Inglês',
+                    'Espanhol'
+                ],
+                icone: '🌎',
+                descricao: 'Inglês e Espanhol'
+            },
+            {
+                nome: 'Matemática',
+                aliases: ['Matemática'],
+                icone: '📐',
+                descricao: 'Números, álgebra e geometria'
+            },
+            {
+                nome: 'Biologia',
+                aliases: ['Biologia'],
+                icone: '🧬',
+                descricao: 'Vida, genética e ecologia'
+            },
+            {
+                nome: 'Química',
+                aliases: ['Química'],
+                icone: '⚗️',
+                descricao: 'Matéria, reações e química orgânica'
+            },
+            {
+                nome: 'Física',
+                aliases: ['Física'],
+                icone: '⚛️',
+                descricao: 'Mecânica, energia e eletricidade'
+            },
+            {
+                nome: 'História',
+                aliases: ['História'],
+                icone: '🏛️',
+                descricao: 'Brasil e mundo'
+            },
+            {
+                nome: 'Geografia',
+                aliases: ['Geografia'],
+                icone: '🌍',
+                descricao: 'Espaço, sociedade e natureza'
+            },
+            {
+                nome: 'Filosofia',
+                aliases: ['Filosofia'],
+                icone: '💭',
+                descricao: 'Pensamento, ética e sociedade'
+            },
+            {
+                nome: 'Sociologia',
+                aliases: ['Sociologia'],
+                icone: '👥',
+                descricao: 'Sociedade, cultura e política'
+            }
+        ];
+
+        let conteudosCarregados = [];
+        let materiaAtual = '';
+        let conteudoAtual = null;
+        let usuarioAtual = null;
+
+        function normalizar(valor) {
+            return String(valor ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+        }
+
+        function materiaConfig(nome) {
+            return MATERIAS_PAGINA.find(m => m.nome === nome) || {
+                nome,
+                aliases: [nome],
+                icone: '📖',
+                descricao: 'Conteúdos de estudo'
+            };
+        }
+
+        async function iniciarPagina() {
+            // Exige login e utiliza o cabeçalho original da BRIO.
+            usuarioAtual = await requireUser();
+
+            if (!usuarioAtual) return;
+
+            header();
+
+            document.getElementById('lista-materias').innerHTML =
+                MATERIAS_PAGINA.map(m => `
+                    <button
+                        class="materia-card"
+                        type="button"
+                        onclick="selecionarMateria('${m.nome.replace(/'/g, "\\'")}')">
+
+                        <div class="materia-icone">${m.icone}</div>
+
+                        <div class="materia-info">
+                            <h3>${m.nome}</h3>
+                            <p>${m.descricao}</p>
+                        </div>
+
+                        <span class="materia-seta">→</span>
+                    </button>
+                `).join('');
+
+            await carregarConteudos();
+        }
+
+        async function carregarConteudos() {
+            try {
+                const resposta = await api('conteudos');
+
+                if (!Array.isArray(resposta)) {
+                    throw new Error(
+                        'A API não retornou uma lista de conteúdos.'
+                    );
+                }
+
+                conteudosCarregados = resposta.map(item => ({
+                    ...item,
+                    id: Number(item.id),
+                    percentual: Number(item.percentual || 0),
+                    concluido:
+                        Number(item.concluido) === 1 ||
+                        item.concluido === true
+                }));
+
+                if (materiaAtual) {
+                    renderizarLista();
+                }
+
+                return true;
+
+            } catch (erro) {
+                console.error('Erro ao carregar conteúdos:', erro);
+
+                mostrarErro(
+                    'Não foi possível carregar os conteúdos. ' +
+                    'Verifique o servidor e tente novamente.'
+                );
+
+                return false;
+            }
+        }
+
+        function mostrarErro(mensagem) {
+            const lista = document.getElementById('lista');
+
+            if (lista) {
+                lista.innerHTML = `
+                    <div class="empty">${mensagem}</div>
+                `;
+            }
+        }
+
+        function selecionarMateria(materia) {
+            materiaAtual = materia;
+
+            document.getElementById('selecao-materias').style.display =
+                'none';
+
+            document.getElementById('conteudo-completo').style.display =
+                'none';
+
+            document.getElementById('conteudos-materia').style.display =
+                'block';
+
+            document.getElementById('materia-badge').textContent =
+                materia;
+
+            document.getElementById('titulo-materia').textContent =
+                materia;
+
+            renderizarLista();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function renderizarLista() {
+            const lista = document.getElementById('lista');
+
+            const aliases = materiaConfig(materiaAtual)
+                .aliases.map(normalizar);
+
+            const conteudos = conteudosCarregados.filter(item =>
+                aliases.includes(normalizar(item.materia))
+            );
+
+            if (!conteudos.length) {
+                lista.innerHTML = `
+                    <div class="empty">
+                        <h3>Nenhum conteúdo cadastrado</h3>
+
+                        <p>
+                            Não há tópicos cadastrados para
+                            ${materiaAtual}.
+                        </p>
+
+                        <p>
+                            Os conteúdos precisam ser inseridos na tabela
+                            <code>conteudos</code> do banco de dados
+                            para ficarem disponíveis a todos os alunos.
+                        </p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            lista.innerHTML = conteudos.map(c => `
+                <article class="card">
+                    <span class="badge">${esc(c.materia)}</span>
+
+                    <h3>${esc(c.titulo)}</h3>
+
+                    <p>${esc(c.descricao || '')}</p>
+
+                    <p
+                        class="conteudo-status"
+                        style="color:${c.concluido ? '#2e7d32' : '#817784'}">
+
+                        ${c.concluido
+                            ? '✓ Conteúdo concluído'
+                            : '○ Ainda não estudado'}
+                    </p>
+
+                    <div class="progress">
+                        <span style="width:${c.concluido ? 100 : c.percentual}%"></span>
+                    </div>
+
+                    <p class="small">
+                        Progresso: ${c.concluido ? 100 : c.percentual}%
+                    </p>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="abrirConteudo(${c.id})">
+
+                        ${c.concluido
+                            ? 'Revisar conteúdo'
+                            : 'Estudar'}
+                    </button>
+                </article>
+            `).join('');
+        }
+
+        function abrirConteudo(id) {
+            conteudoAtual = conteudosCarregados.find(
+                item => item.id === Number(id)
+            );
+
+            if (!conteudoAtual) {
+                alert(
+                    'Conteúdo não encontrado. ' +
+                    'Atualize a página e tente novamente.'
+                );
+
+                return;
+            }
+
+            document.getElementById('selecao-materias').style.display =
+                'none';
+
+            document.getElementById('conteudos-materia').style.display =
+                'none';
+
+            document.getElementById('conteudo-completo').style.display =
+                'block';
+
+            document.getElementById('conteudo-materia').textContent =
+                conteudoAtual.materia || materiaAtual;
+
+            document.getElementById('conteudo-titulo').textContent =
+                conteudoAtual.titulo || 'Conteúdo';
+
+            document.getElementById('conteudo-descricao').textContent =
+                conteudoAtual.descricao || '';
+
+            document.getElementById('conteudo-texto').textContent =
+                conteudoAtual.texto ||
+                'O conteúdo completo ainda não foi cadastrado.';
+
+            document.getElementById('checkbox-concluido').checked =
+                conteudoAtual.concluido;
+
+            document.getElementById('checkbox-concluido').disabled =
+                false;
+
+            document.getElementById('status-progresso').textContent =
+                conteudoAtual.concluido
+                    ? '✓ Seu progresso está salvo como concluído.'
+                    : 'Marque a caixa quando terminar de estudar.';
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        async function salvarConclusao(concluido) {
+            if (!conteudoAtual) return;
+
+            const checkbox =
+                document.getElementById('checkbox-concluido');
+
+            const status =
+                document.getElementById('status-progresso');
+
+            const estadoAnterior = conteudoAtual.concluido;
+
+            checkbox.disabled = true;
+            status.textContent = 'Salvando seu progresso...';
+
+            try {
+                const resposta = await api('progresso', {
+                    method: 'POST',
+
+                    body: JSON.stringify({
+                        conteudo_id: conteudoAtual.id,
+                        percentual: concluido ? 100 : 0
+                    })
+                });
+
+                if (
+                    !resposta ||
+                    resposta.ok === false ||
+                    resposta.erro
+                ) {
+                    throw new Error(
+                        resposta?.erro ||
+                        'Não foi possível salvar o progresso.'
+                    );
+                }
+
+                conteudoAtual.concluido = concluido;
+                conteudoAtual.percentual = concluido ? 100 : 0;
+
+                const indice = conteudosCarregados.findIndex(
+                    item => item.id === conteudoAtual.id
+                );
+
+                if (indice !== -1) {
+                    conteudosCarregados[indice].concluido = concluido;
+
+                    conteudosCarregados[indice].percentual =
+                        concluido ? 100 : 0;
+                }
+
+                status.textContent = concluido
+                    ? '✓ Progresso salvo na sua conta!'
+                    : 'Marcação removida e progresso atualizado.';
+
+                renderizarLista();
+
+            } catch (erro) {
+                console.error('Erro ao salvar progresso:', erro);
+
+                checkbox.checked = estadoAnterior;
+
+                status.textContent =
+                    'Não foi possível salvar. Verifique se você ' +
+                    'está conectado e tente novamente.';
+
+            } finally {
+                checkbox.disabled = false;
+            }
+        }
+
+        function voltarListaConteudos() {
+            document.getElementById('conteudo-completo').style.display =
+                'none';
+
+            document.getElementById('conteudos-materia').style.display =
+                'block';
+
+            conteudoAtual = null;
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function voltarMaterias() {
+            document.getElementById('conteudos-materia').style.display =
+                'none';
+
+            document.getElementById('conteudo-completo').style.display =
+                'none';
+
+            document.getElementById('selecao-materias').style.display =
+                'block';
+
+            materiaAtual = '';
+            conteudoAtual = null;
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            iniciarPagina
+        );
+    </script>
+</body>
+</html>

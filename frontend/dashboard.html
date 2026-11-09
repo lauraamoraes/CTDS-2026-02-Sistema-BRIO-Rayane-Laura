@@ -1,10 +1,415 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dashboard — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header>
-<main class="container"><div class="dashboard-head"><div><h1 id="welcome">Olá!</h1><p class="muted">Um passo de cada vez.</p></div><div class="mascot" style="font-size:55px;margin:0">🐣</div></div>
-<div class="stats"><div class="card"><span>XP</span><strong id="xp">0</strong></div><div class="card"><span>Nível</span><strong id="nivel">1</strong></div><div class="card"><span>Simulados</span><strong id="simulados">0</strong></div><div class="card"><span>Redações</span><strong id="redacoes">0</strong></div></div>
-<h2 class="section-title">Sua rotina</h2><div id="tarefas" class="grid"></div>
-<h2 class="section-title">Acesso rápido</h2><div class="grid">
-<a class="card" href="conteudos.html"><h3>📚 Conteúdos</h3><p>Continue seu aprendizado.</p></a>
-<a class="card" href="simulados.html"><h3>📝 Simulados</h3><p>Pratique e veja seu desempenho.</p></a>
-<a class="card" href="redacoes.html"><h3>✍️ Redações</h3><p>Escolha um tema e escreva.</p></a>
-</div></main><script src="js/app.js"></script><script>initDashboard()</script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | BRIO</title>
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+    <link rel="stylesheet" href="css/style.css?v=20261103">
+</head>
+
+<body>
+
+    <main class="container dashboard-container">
+
+        <!-- CABEÇALHO E PERFIL -->
+
+        <section class="dashboard-boas-vindas">
+
+            <div class="boas-vindas-texto">
+
+                <span class="dashboard-etiqueta">
+                    ÁREA DO ALUNO
+                </span>
+
+                
+<h1>
+    Olá, <span id="nomeAluno">...</span>! 💜
+</h1>
+
+
+                <p>Um passo de cada vez. Continue evoluindo!</p>
+
+            </div>
+
+            <a href="perfil.html" class="perfil-resumo">
+
+                <div class="perfil-avatar">
+                    <span class="perfil-inicial" style="display:flex;">
+                        👤
+                    </span>
+                </div>
+                <div class="perfil-informacoes">
+                    <strong>Meu perfil</strong>
+                    <span>Editar informações</span>
+                </div>
+
+                <span class="perfil-seta">›</span>
+
+            </a>
+
+        </section>
+
+
+        <!-- ESPAÇO DO MASCOTE -->
+
+        <section class="mascote-dashboard">
+
+            <div class="mascote-conteudo">
+
+                <span class="mascote-tag">
+                    SEU COMPANHEIRO DE ESTUDOS
+                </span>
+
+                <h2>Vamos aprender juntos?</h2>
+
+                <p>
+                    Cada pequeno passo conta!
+                    Continue estudando, praticando e
+                    conquistando seus objetivos.
+                </p>
+
+                <span class="mascote-frase">
+                    ✨ Você é capaz de ir mais longe!
+                </span>
+
+            </div>
+
+            <div class="mascote-imagem">
+    <img src="img/mascote1.png" >
+</div>
+
+        </section>
+
+
+        <!-- ESTATÍSTICAS DO ALUNO -->
+
+        <section class="dashboard-stats">
+
+            <div class="stat-card">
+                <span>⭐</span>
+                <p>XP</p>
+                <strong id="xpAluno">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>🏆</span>
+                <p>Nível</p>
+                <strong id="nivelAluno">1</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>📝</span>
+                <p>Simulados</p>
+                <strong id="totalSimulados">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>✍️</span>
+                <p>Redações</p>
+                <strong id="totalRedacoes">0</strong>
+            </div>
+
+        </section>
+
+
+        <!-- ROTINA -->
+
+        <section class="rotina-secao">
+
+            <div class="secao-titulo">
+                <div>
+                    <span class="dashboard-etiqueta">
+                        ORGANIZE SEUS ESTUDOS
+                    </span>
+
+                    <h2>Sua rotina</h2>
+                </div>
+
+            </div>
+
+            <div id="rotina" class="rotina-lista">
+
+                <div class="rotina-vazia">
+                    <span>📅</span>
+                    <p>Nenhuma atividade cadastrada.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACESSO RÁPIDO -->
+
+        <section class="acesso-secao">
+
+            <span class="dashboard-etiqueta">
+                CONTINUE SUA JORNADA
+            </span>
+
+            <h2>Acesso rápido</h2>
+
+            <div class="acesso-grid">
+
+                <a href="conteudos.html" class="acesso-card">
+
+                    <div class="acesso-icone">📚</div>
+
+                    <h3>Conteúdos</h3>
+
+                    <p>
+                        Continue seu aprendizado.
+                    </p>
+
+                    <span class="acesso-link">
+                        Acessar →
+                    </span>
+
+                </a>
+
+
+                <a href="simulados.html" class="acesso-card">
+
+                    <div class="acesso-icone">📝</div>
+
+                    <h3>Simulados</h3>
+
+                    <p>
+                        Pratique e veja seu desempenho.
+                    </p>
+
+                    <span class="acesso-link">
+                        Acessar →
+                    </span>
+
+                </a>
+
+
+                <a href="redacoes.html" class="acesso-card">
+
+                    <div class="acesso-icone">✍️</div>
+
+                    <h3>Redações</h3>
+
+                    <p>
+                        Escolha um tema e escreva.
+                    </p>
+
+                    <span class="acesso-link">
+                        Acessar →
+                    </span>
+
+                </a>
+
+
+                <a href="progresso.html" class="acesso-card" id="cardProgresso">
+
+                    <div class="acesso-icone">🏅</div>
+
+                    <h3>Meu progresso</h3>
+
+                    <p>
+                        Veja seu progresso e conquistas.
+                    </p>
+
+                    <span class="acesso-link">
+                        Acessar →
+                    </span>
+
+                </a>
+
+
+                <a href="jogo.html" class="acesso-card" id="cardJogo">
+
+                    <div class="acesso-icone">🎮</div>
+
+                    <h3>Jogo</h3>
+
+                    <p>
+                        Ganhe pontos e relaxe.
+                    </p>
+
+                    <span class="acesso-link">
+                        Acessar →
+                    </span>
+
+                </a>
+
+
+                <a href="calendario.html" class="acesso-card" id="cardCalendario">
+
+                    <div class="acesso-icone">📅</div>
+
+                    <h3>Calendário</h3>
+
+                    <p>
+                        Agende um compromisso.
+                    </p>
+
+                    <span class="acesso-link">
+                        Acessar →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- SAIR DA CONTA -->
+
+        <div class="dashboard-sair">
+
+            <button type="button" class="btn-sair-dashboard" onclick="sairDaConta()">
+                ← Sair da conta
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="js/app.js?v=20261103"></script>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        carregarRotinaDashboard();
+    });
+</script>
+
+
+    
+<script>
+    // CARDS EXCLUSIVOS PARA ASSINANTES
+    const cardsPremium = [
+        "cardProgresso",
+        "cardJogo",
+        "cardCalendario"
+    ];
+
+    async function verificarBloqueioPremium() {
+        try {
+            // Verifica o usuário logado
+            const usuario = await requireUser();
+
+            if (!usuario) return;
+
+            // Consulta a assinatura no backend
+            const plano = await api("verificar_plano");
+
+            // Bloqueia apenas quando não há plano pago
+            const bloqueado = !plano.pago;
+
+            cardsPremium.forEach(id => {
+                const card = document.getElementById(id);
+
+                if (!card) return;
+
+                card.classList.toggle(
+                    "bloqueado",
+                    bloqueado
+                );
+
+                if (bloqueado) {
+                    card.setAttribute(
+                        "aria-label",
+                        "Exclusivo para assinantes"
+                    );
+
+                    card.addEventListener("click", function(event) {
+                        event.preventDefault();
+
+                        alert(
+                            "🔒 Esta funcionalidade é exclusiva para assinantes do BRIO. Escolha um plano para liberar o acesso!"
+                        );
+
+                        window.location.href = "planos.html";
+                    });
+                }
+            });
+
+        } catch (erro) {
+            console.error(
+                "Erro ao verificar assinatura:",
+                erro
+            );
+        }
+    }
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        verificarBloqueioPremium
+    );
+</script>
+
+    
+<script>
+    async function carregarDadosDashboard() {
+        try {
+            // Busca o usuário que está logado
+            const usuario = await requireUser();
+
+            if (!usuario) return;
+
+            // Pega o primeiro nome do usuário cadastrado
+            const primeiroNome = String(usuario.nome || "Estudante")
+                .trim()
+                .split(/\s+/)[0];
+
+            // Mostra o nome no cabeçalho
+            document.getElementById("nomeAluno").textContent =
+                primeiroNome;
+
+        } catch (erro) {
+            console.error("Erro ao carregar usuário:", erro);
+        }
+    }
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        carregarDadosDashboard
+    );
+</script>
+
+
+    <script>
+
+        // SAIR DA CONTA
+
+        function sairDaConta() {
+
+            if (confirm("Deseja realmente sair da sua conta?")) {
+
+                // Encerra a sessão no navegador.
+                // Ajuste conforme o sistema de autenticação do BRIO.
+
+                window.location.href = "index.html";
+
+            }
+
+        }
+
+    </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+
+        // Carrega a rotina cadastrada no calendário
+        await carregarRotinaDashboard();
+
+        // Atualiza XP, nível, simulados e redações
+        await atualizarContadoresDashboard();
+
+    });
+</script>
+
+</body>
+
+</html>

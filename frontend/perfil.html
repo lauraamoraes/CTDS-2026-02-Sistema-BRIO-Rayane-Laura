@@ -1,3 +1,126 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Perfil — BRIO</title><link rel="stylesheet" href="css/style.css"></head><body><header></header><main class="container">
-<h1>Meu perfil</h1><div id="perfil"></div></main><script src="js/app.js"></script><script>initPerfil()</script></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu perfil | BRIO</title>
+
+    <link rel="stylesheet" href="css/style.css?v=20261103">
+    
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="shortcut icon" type="image/png" href="img/logo.png">
+</head>
+
+<body>
+
+    <main class="container perfil-pagina">
+
+        <!-- CABEÇALHO -->
+
+        <header class="perfil-cabecalho">
+
+            <a href="dashboard.html" class="perfil-voltar">
+                ← Voltar
+            </a>
+
+            <span class="perfil-etiqueta">
+                MINHA CONTA
+            </span>
+
+            <h1>Meu perfil 💜</h1>
+
+            <p>
+                Acompanhe suas informações e sua jornada
+                de aprendizado no BRIO.
+            </p>
+
+        </header>
+
+
+        <!-- CONTEÚDO DO PERFIL -->
+
+        <section class="perfil-layout">
+
+            <!-- INFORMAÇÕES DO ALUNO -->
+
+            <div class="perfil-card">
+
+                <div class="perfil-card-topo">
+
+                    <div class="perfil-avatar-grande">
+                        👤
+                    </div>
+
+                    <div>
+                        <span class="perfil-subtitulo">
+                            SEUS DADOS
+                        </span>
+
+                        <h2>Informações da conta</h2>
+                    </div>
+
+                </div>
+
+                <!--
+                    O JavaScript existente continuará
+                    carregando os dados do banco aqui.
+                -->
+
+                <div id="perfil" class="perfil-dados">
+                    <p>Carregando suas informações...</p>
+                </div>
+
+            </div>
+
+
+            <!-- MASCOTE -->
+
+            <aside class="perfil-mascote-card">
+
+                <span class="perfil-mascote-etiqueta">
+                    SEU COMPANHEIRO DE ESTUDOS
+                </span>
+
+                <img
+                    src="img/perfil.png"
+                    alt="Mascote BRIO lendo um livro"
+                    class="perfil-mascote-imagem"
+                >
+
+                <h2>Continue brilhando! ✨</h2>
+
+                <p>
+                    Cada atividade concluída é mais um
+                    passo na sua jornada. Continue
+                    aprendendo e conquistando seus objetivos!
+                </p>
+
+                <div class="perfil-mascote-frase">
+                    💜 Seu esforço faz a diferença!
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="js/app.js?v=20261103"></script>
+
+    <script>
+        initPerfil();
+    </script>
+
+</body>
+
+</html>
