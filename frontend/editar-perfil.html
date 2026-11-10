@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar perfil | BRIO</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #fffaf8;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .editar-container {
+            max-width: 650px;
+            margin: 65px auto;
+            padding: 25px;
+        }
+
+        .editar-card {
+            background: white;
+            border: 1px solid #e9d9f5;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 12px 35px #43245a12;
+        }
+
+        .editar-card h1 {
+            color: #60408e;
+            margin-bottom: 10px;
+        }
+
+        .editar-card p {
+            color: #887995;
+        }
+
+        .editar-card label {
+            display: block;
+            margin-top: 22px;
+            margin-bottom: 7px;
+            color: #503b70;
+            font-weight: 600;
+        }
+
+        .editar-card input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e5d9ef;
+            border-radius: 12px;
+            font: inherit;
+            box-sizing: border-box;
+        }
+
+        .editar-card input:focus {
+            outline: 2px solid #a780dc;
+        }
+
+        .salvar {
+            width: 100%;
+            margin-top: 30px;
+            padding: 15px;
+            background: #654398;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .salvar:hover {
+            background: #50317e;
+        }
+
+        .voltar {
+            color: #654398;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        #mensagem {
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="editar-container">
+        <a href="perfil.html" class="voltar">← Voltar ao perfil</a>
+
+        <div class="editar-card">
+            <h1>Editar informações 💜</h1>
+            <p>Atualize seus dados no BRIO.</p>
+
+            <form id="formEditar">
+                <label for="nome">Nome completo</label>
+                <input id="nome" type="text" maxlength="150" required>
+
+                <label for="email">E-mail</label>
+                <input id="email" type="email" maxlength="190" required>
+
+                <label for="objetivo">Objetivo de estudos</label>
+                <input id="objetivo" type="text" maxlength="255">
+
+                <button class="salvar" type="submit">
+                    Salvar alterações 💜
+                </button>
+            </form>
+
+            <p id="mensagem" role="status"></p>
+        </div>
+    </main>
+
+    <script>
+        const API = new URL(
+    "../backend/api.php",
+    window.location.href
+).pathname;
+
+        
+async function requisicao(acao, opcoes = {}) {
+    const resposta = await fetch(
+        API + "?action=" + encodeURIComponent(acao),
+        {
+            credentials: "same-origin",
+            ...opcoes
+        }
+    );
+
+    const texto = await resposta.text();
+
+    let dados;
+
+    try {
+        dados = JSON.parse(texto);
+    } catch (erro) {
+        throw new Error(
+            "O servidor não retornou JSON. " +
+            "Verifique se backend/api.php existe neste endereço: " +
+            API
+        );
+    }
+
+    if (!resposta.ok || dados.erro) {
+        throw new Error(
+            dados.erro || "Erro ao acessar o banco de dados."
+        );
+    }
+
+    return dados;
+}
+
+
+        async function carregarPerfil() {
+            try {
+                const usuario = await requisicao("perfil");
+
+                document.getElementById("nome").value =
+                    usuario.nome || "";
+
+                document.getElementById("email").value =
+                    usuario.email || "";
+
+                document.getElementById("objetivo").value =
+                    usuario.objetivo || "";
+
+            } catch (erro) {
+                document.getElementById("mensagem").textContent =
+                    erro.message;
+            }
+        }
+
+        document.getElementById("formEditar")
+            .addEventListener("submit", async function(evento) {
+                evento.preventDefault();
+
+                const botao = this.querySelector("button");
+                botao.disabled = true;
+
+                const mensagem = document.getElementById("mensagem");
+                mensagem.textContent = "Salvando...";
+
+                const dados = {
+                    nome: document.getElementById("nome").value.trim(),
+                    email: document.getElementById("email").value.trim(),
+                    objetivo: document.getElementById("objetivo").value.trim()
+                };
+
+                try {
+                    await requisicao("editar_perfil", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dados)
+                    });
+
+                    mensagem.textContent = "Alterações salvas com sucesso! 💜";
+
+                    window.location.href = "perfil.html";
+
+                } catch (erro) {
+                    mensagem.textContent = erro.message;
+                } finally {
+                    botao.disabled = false;
+                }
+            });
+
+        carregarPerfil();
+    </script>
+</body>
+</html>

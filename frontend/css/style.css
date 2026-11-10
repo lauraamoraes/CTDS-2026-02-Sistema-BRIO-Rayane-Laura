@@ -4765,3 +4765,24 @@ body.pagina-estudos-brio {
         padding: 20px;
     }
 }
+
+/* ATIVIDADES CONCLUÍDAS DO CALENDÁRIO */
+
+.card.atividade-brio.atividade-concluida {
+    background-color: #e9e9e9 !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+}
+
+.card.atividade-brio.atividade-concluida .atividade-titulo {
+    text-decoration: line-through !important;
+    color: #888888 !important;
+}
+
+.card.atividade-brio.atividade-concluida p {
+    color: #777777 !important;
+}
+
+.card.atividade-brio.atividade-concluida .atividade-acoes {
+    opacity: 1;
+}

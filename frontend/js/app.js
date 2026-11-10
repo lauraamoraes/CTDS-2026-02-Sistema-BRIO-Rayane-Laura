@@ -1,5 +1,4 @@
 const API = '../backend/api.php';
-
 /* =========================
    COMUNICAÇÃO COM A API
 ========================= */
@@ -1408,112 +1407,318 @@ async function initPerfil() {
    CALENDÁRIO
 ========================= */
 
+
+/* =========================
+   CALENDÁRIO
+========================= */
+
+
+
+let atividadesCalendario = [];
+
 async function initCalendario() {
-
-    // Verifica se o usuário possui plano pago
     const permitido = await requirePaidPlan();
+    if (!permitido) return;
 
-    if (!permitido) {
-        return;
-    }
-
-    const user = await requireUser();
-    if (!user) return;
+    const usuario = await requireUser();
+    if (!usuario) return;
 
     header();
 
-    const tarefas = await api('tarefas');
+    const lista = document.getElementById('tarefas');
+    const botaoSalvar = document.getElementById('salvar');
 
-    if (tarefas.length > 0) {
+    const campo = id => document.getElementById(id);
 
-        qs('tarefas').innerHTML = tarefas.map(tarefa => `
-            <div class="card">
+    async function carregarAtividades() {
+        lista.innerHTML = '<p>Carregando atividades...</p>';
 
-                <b>${esc(tarefa.titulo)}</b>
+        try {
+            const resposta = await api('tarefas');
 
-                <p class="small">
-                    ${esc(tarefa.data)}
-                    ${tarefa.horario ? esc(tarefa.horario) : ''}
-                </p>
+            atividadesCalendario = Array.isArray(resposta)
+                ? resposta
+                : Array.isArray(resposta.tarefas)
+                    ? resposta.tarefas
+                    : [];
 
-                <span class="badge">
-                    ${esc(tarefa.tipo)} • ${esc(tarefa.status)}
-                </span>
+            if (!atividadesCalendario.length) {
+                lista.innerHTML =
+                    '<div class="empty">Nenhuma atividade cadastrada.</div>';
+                return;
+            }
 
-            </div>
-        `).join('');
+            lista.innerHTML = atividadesCalendario.map(tarefa => {
+                const id = Number(tarefa.id);
 
-    } else {
+                const concluida =
+                    String(tarefa.status || '').toLowerCase() === 'concluida';
 
-        qs('tarefas').innerHTML =
-            '<div class="empty">Nenhuma atividade. Use o formulário para criar.</div>';
+                const data = String(tarefa.data || '')
+                    .slice(0, 10)
+                    .split('-')
+                    .reverse()
+                    .join('/');
 
+                const horario = tarefa.horario
+                    ? String(tarefa.horario).slice(0, 5)
+                    : '';
+
+                return `
+                    <div class="card atividade-brio ${concluida ? 'atividade-concluida' : ''}">
+                        <h3 class="atividade-titulo"
+    style="${concluida ? 'text-decoration:line-through;color:#888888;' : ''}">
+    ${esc(tarefa.titulo || 'Atividade')}
+</h3>
+
+                        <p>${esc(tarefa.descricao || '')}</p>
+
+                        <p>📅 ${esc(data)}
+                            ${horario ? ' • 🕒 ' + esc(horario) : ''}
+                        </p>
+
+                        <p>⏱️ ${esc(tarefa.duracao || 50)} minutos</p>
+
+                        <p>📚 ${esc(tarefa.tipo || 'estudo')}</p>
+
+                        <p>${concluida ? '✅ Concluída' : '⏳ Pendente'}</p>
+
+                        <div class="atividade-acoes">
+                            
+${!concluida ? `
+    <button
+        type="button"
+        class="btn green"
+        onclick="concluirAtividadeBrio(${id})"
+    >
+        ✅ Concluir
+    </button>
+` : `
+    <span style="
+        padding:12px;
+        color:#777;
+        font-weight:600;
+    ">
+        ✔ Já concluída
+    </span>
+`}
+
+
+                            <button type="button"
+                                class="btn"
+                                style="background:#654398;color:white;"
+                                onclick="editarAtividadeCalendario(${id})">
+                                ✏️ Editar
+                            </button>
+
+                            <button type="button"
+                                class="btn"
+                                style="background:#c74762;color:white;"
+                                onclick="excluirAtividadeBrio(${id})">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (erro) {
+            console.error(erro);
+            lista.textContent = 'Erro ao carregar atividades: ' + erro.message;
+        }
     }
 
-    qs('salvar').onclick = async function () {
+    window.editarAtividadeCalendario = function(id) {
+        const tarefa = atividadesCalendario.find(
+            item => Number(item.id) === Number(id)
+        );
 
-        await api('tarefas', {
+        if (!tarefa) {
+            alert('Atividade não encontrada.');
+            return;
+        }
 
-            method: 'POST',
+        campo('titulo').value = tarefa.titulo || '';
+        campo('descricao').value = tarefa.descricao || '';
+        campo('data').value = String(tarefa.data || '').slice(0, 10);
+        campo('horario').value = tarefa.horario
+            ? String(tarefa.horario).slice(0, 5)
+            : '';
+        campo('duracao').value = tarefa.duracao || 50;
+        campo('tipo').value = tarefa.tipo || 'estudo';
 
-            body: JSON.stringify({
+        botaoSalvar.dataset.edicao = String(id);
+        botaoSalvar.textContent = 'Salvar alterações 💜';
 
-                titulo: qs('titulo').value,
-                descricao: qs('descricao').value,
-                data: qs('data').value,
-                horario: qs('horario').value,
-                duracao: qs('duracao').value,
-                tipo: qs('tipo').value
-
-            })
-
+        campo('titulo').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
 
-        window.location.reload();
-
+        campo('titulo').focus();
     };
 
+    botaoSalvar.onclick = async function() {
+        const titulo = campo('titulo').value.trim();
+        const data = campo('data').value;
+
+        if (!titulo || !data) {
+            alert('Preencha o título e a data.');
+            return;
+        }
+
+        const dados = {
+            titulo,
+            descricao: campo('descricao').value.trim(),
+            data,
+            horario: campo('horario').value || null,
+            duracao: Number(campo('duracao').value) || 50,
+            tipo: campo('tipo').value
+        };
+
+        const idEdicao = botaoSalvar.dataset.edicao;
+        botaoSalvar.disabled = true;
+
+        try {
+            if (idEdicao) {
+                await api('editar_tarefa', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        id: Number(idEdicao),
+                        ...dados
+                    })
+                });
+            } else {
+                await api('tarefas', {
+                    method: 'POST',
+                    body: JSON.stringify(dados)
+                });
+            }
+
+            alert(idEdicao
+                ? 'Atividade atualizada! 💜'
+                : 'Atividade adicionada! 💜'
+            );
+
+            ['titulo', 'descricao', 'data', 'horario'].forEach(id => {
+                campo(id).value = '';
+            });
+
+            campo('duracao').value = 50;
+            campo('tipo').value = 'estudo';
+
+            delete botaoSalvar.dataset.edicao;
+            botaoSalvar.textContent = 'Adicionar';
+
+            window.history.replaceState({}, '', 'calendario.html');
+
+            await carregarAtividades();
+
+        } catch (erro) {
+            alert('Erro ao salvar: ' + erro.message);
+        } finally {
+            botaoSalvar.disabled = false;
+        }
+    };
+
+    window.atualizarListaCalendario = carregarAtividades;
+
+    await carregarAtividades();
+
+    const idParaEditar = new URLSearchParams(
+        window.location.search
+    ).get('editar');
+
+    if (idParaEditar) {
+        window.editarAtividadeCalendario(Number(idParaEditar));
+    }
 }
+
+
+function editarAtividadeCalendario(id) {
+    const tarefa = atividadesCalendario.find(
+        item => Number(item.id) === Number(id)
+    );
+
+    if (!tarefa) {
+        alert('Atividade não encontrada.');
+        return;
+    }
+
+    qs('titulo').value = tarefa.titulo || '';
+    qs('descricao').value = tarefa.descricao || '';
+    qs('data').value = String(tarefa.data || '').slice(0, 10);
+    qs('horario').value = String(tarefa.horario || '').slice(0, 5);
+    qs('duracao').value = tarefa.duracao ?? 50;
+    qs('tipo').value = tarefa.tipo || 'estudo';
+
+    const botao = qs('salvar');
+
+    botao.dataset.edicao = id;
+    botao.textContent = 'Salvar alterações';
+
+    qs('titulo').focus();
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+async function concluirAtividadeCalendario(id) {
+    try {
+        await api('concluir_tarefa', {
+            method: 'POST',
+            body: JSON.stringify({ id: Number(id) })
+        });
+
+        alert('Atividade concluída com sucesso! 💜');
+        window.location.reload();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Erro ao concluir: ' + erro.message);
+    }
+}
+
 
 /* =========================
    PROFESSOR
 ========================= */
 
-async function initProfessor() {
     
-
+async function initProfessor() {
     const user = await requireUser();
     if (!user) return;
-    // MOSTRAR NOME DO PROFESSOR LOGADO
-const boasVindas = document.getElementById("boasVindasProfessor");
 
-if (boasVindas) {
-    const nomeProfessor = String(user.nome || "Professor").trim();
-
-    boasVindas.textContent = `Bem-vindo(a), ${nomeProfessor}! 💜`;
-}
-
-    
-
-if (user.tipo !== 'professor') {
-    window.location.replace('login-professor.html');
-    return;
-}
-
-
+    if (user.tipo !== 'professor') {
+        window.location.replace('login-professor.html');
+        return;
+    }
 
     header();
 
-    const dados = await api('redacoes_professor');
-    
-const redacoesPendentes = dados.filter(redacao => {
-    return redacao.status !== 'corrigida'
-        && redacao.nota == null;
-});
+    const boasVindas = document.getElementById(
+        'boasVindasProfessor'
+    );
 
+    if (boasVindas) {
+        const nomeProfessor = String(
+            user.nome || 'Professor'
+        ).trim();
+
+        boasVindas.textContent =
+            'Bem-vindo(a), ' + nomeProfessor + '! 💜';
+    }
+
+    const dados = await api('redacoes_professor');
+
+    const redacoesPendentes = dados.filter(redacao => {
+        return redacao.status !== 'corrigida'
+            && redacao.nota == null;
+    });
 
     if (redacoesPendentes.length > 0) {
-
         qs('lista').innerHTML = redacoesPendentes.map(redacao => `
             <article class="card">
 
@@ -1524,8 +1729,7 @@ const redacoesPendentes = dados.filter(redacao => {
                 <h3>${esc(redacao.tema)}</h3>
 
                 <p>
-                    <b>Aluno:</b>
-                    ${esc(redacao.aluno)}
+                    <b>Aluno:</b> ${esc(redacao.aluno)}
                 </p>
 
                 <p class="small">
@@ -1535,32 +1739,28 @@ const redacoesPendentes = dados.filter(redacao => {
                 <div class="two">
 
                     <div class="field">
-
-                        <label for="nota${esc(redacao.id)}">
+                        <label for="nota${Number(redacao.id)}">
                             Nota
                         </label>
 
                         <input
-                            id="nota${esc(redacao.id)}"
+                            id="nota${Number(redacao.id)}"
                             type="number"
                             min="0"
                             max="1000"
-                            value="${redacao.nota === null ? '' : esc(redacao.nota)}"
+                            value="${redacao.nota == null ? '' : esc(redacao.nota)}"
                         >
-
                     </div>
 
                     <div class="field">
-
-                        <label for="coment${esc(redacao.id)}">
+                        <label for="coment${Number(redacao.id)}">
                             Comentário
                         </label>
 
                         <textarea
-                            id="coment${esc(redacao.id)}"
+                            id="coment${Number(redacao.id)}"
                             style="min-height:120px"
                         >${esc(redacao.comentario || '')}</textarea>
-
                     </div>
 
                 </div>
@@ -1576,14 +1776,11 @@ const redacoesPendentes = dados.filter(redacao => {
         `).join('');
 
     } else {
-
         qs('lista').innerHTML =
             '<div class="empty">Nenhuma redação enviada.</div>';
-
     }
-    
-    await carregarHistoricoProfessor();
 
+    await carregarHistoricoProfessor();
 }
 
 
@@ -1702,97 +1899,190 @@ document.addEventListener(
    BRIO - ATIVIDADES NO DASHBOARD
 ===================================== */
 
-async function carregarRotinaDashboard() {
 
-    const container = document.getElementById("rotina");
+
+async function carregarRotinaDashboard() {
+    const container = document.getElementById('rotina');
 
     if (!container) return;
 
-    container.innerHTML = "<p>Carregando atividades...</p>";
+    container.innerHTML = '<p>Carregando atividades...</p>';
 
     try {
-
-        // O PHP já retorna as tarefas nesta ação.
-        const dados = await api("dashboard");
+        const dados = await api('dashboard');
 
         const atividades = Array.isArray(dados.tarefas)
             ? dados.tarefas
             : [];
 
         if (atividades.length === 0) {
-
             container.innerHTML = `
                 <div class="rotina-vazia">
                     <span>🗓️</span>
                     <p>Nenhuma atividade cadastrada.</p>
                 </div>
             `;
-
             return;
         }
 
         container.innerHTML = atividades.map(atividade => {
+            const id = Number(atividade.id);
 
             const dataFormatada = atividade.data
                 ? String(atividade.data)
                     .slice(0, 10)
-                    .split("-")
+                    .split('-')
                     .reverse()
-                    .join("/")
-                : "Sem data";
+                    .join('/')
+                : 'Sem data';
 
             const horario = atividade.horario
                 ? String(atividade.horario).slice(0, 5)
-                : "";
+                : '';
 
-            const tipo = {
-                estudo: "📚",
-                simulado: "📝",
-                redacao: "✍️",
-                outro: "📌"
-            }[atividade.tipo] || "📚";
+            const iconeTipo = {
+                estudo: '📚',
+                simulado: '📝',
+                redacao: '✍️',
+                outro: '📌'
+            }[atividade.tipo] || '📚';
 
-            const concluida = atividade.status === "concluida";
+            const nomesTipo = {
+                estudo: 'Estudo',
+                simulado: 'Simulado',
+                redacao: 'Redação',
+                outro: 'Outro'
+            };
+
+            const nomeTipo =
+                nomesTipo[atividade.tipo] || 'Estudo';
+
+            const concluida =
+                String(atividade.status || '').toLowerCase()
+                === 'concluida';
 
             return `
-                <div class="rotina-atividade">
+                <div
+                    class="rotina-atividade"
+                    style="${concluida
+                        ? 'background:#f7f5f9;'
+                        : ''}"
+                >
 
                     <div class="rotina-atividade-icone">
-                        ${tipo}
+                        ${iconeTipo}
                     </div>
 
                     <div class="rotina-atividade-info">
 
-                        <h3>${esc(atividade.titulo || "Atividade")}</h3>
+                        <h3 style="${
+                            concluida
+                                ? 'text-decoration:line-through;color:#a79ab8;'
+                                : ''
+                        }">
+                            ${esc(atividade.titulo || 'Atividade')}
+                        </h3>
+
+                        <p style="${
+                            concluida ? 'color:#938a9e;' : ''
+                        }">
+                            ${esc(atividade.descricao || '')}
+                        </p>
 
                         <p>
                             📅 ${esc(dataFormatada)}
-                            ${horario ? ` • 🕒 ${esc(horario)}` : ""}
+                            ${horario
+                                ? ' • 🕒 ' + esc(horario)
+                                : ''}
+                        </p>
+
+                        <p>
+                            ⏱️ ${esc(atividade.duracao || 50)} minutos
+                        </p>
+
+                        <p>
+                            ${iconeTipo} ${esc(nomeTipo)}
                         </p>
 
                         <small>
                             ${concluida
-                                ? "✅ Concluída"
-                                : "⏳ Pendente"}
+                                ? '✅ Concluída'
+                                : '⏳ Pendente'}
                         </small>
+
+                        <div
+                            class="atividade-acoes"
+                            style="
+                                display:flex;
+                                gap:10px;
+                                flex-wrap:wrap;
+                                margin-top:16px;
+                            "
+                        >
+
+                            
+${!concluida ? `
+    <button
+        type="button"
+        class="btn green"
+        onclick="concluirAtividadeBrio(${id})"
+    >
+        ✅ Concluir
+    </button>
+` : `
+    <span style="
+        display:inline-flex;
+        align-items:center;
+        padding:12px;
+        color:#777;
+        font-weight:600;
+    ">
+        ✔ Já concluída
+    </span>
+`}
+
+
+                            <a
+                                href="calendario.html?editar=${id}"
+                                class="btn"
+                                style="
+                                    background:#654398;
+                                    color:white;
+                                    text-decoration:none;
+                                "
+                            >
+                                ✏️ Editar
+                            </a>
+
+                            <button
+                                type="button"
+                                class="btn"
+                                style="
+                                    background:#c74762;
+                                    color:white;
+                                "
+                                onclick="excluirAtividadeBrio(${id})"
+                            >
+                                🗑️ Excluir
+                            </button>
+
+                        </div>
 
                     </div>
 
                 </div>
             `;
-
-        }).join("");
+        }).join('');
 
     } catch (erro) {
-
-        console.error("Erro ao carregar rotina:", erro);
+        console.error('Erro ao carregar rotina:', erro);
 
         container.textContent =
-            "Não foi possível carregar suas atividades.";
-
+            'Não foi possível carregar suas atividades.';
     }
-
 }
+
+
 
 /* =========================================
    ATUALIZAR ESTATÍSTICAS DO DASHBOARD
@@ -1848,22 +2138,21 @@ async function atualizarContadoresDashboard() {
    HISTÓRICO DE CORREÇÕES DO PROFESSOR
 ========================================= */
 
-async function carregarHistoricoProfessor() {
 
+async function carregarHistoricoProfessor() {
     const container = document.getElementById(
-        "historicoCorrecoesProfessor"
+        'historicoCorrecoesProfessor'
     );
 
     const contador = document.getElementById(
-        "totalCorrecoesProfessor"
+        'totalCorrecoesProfessor'
     );
 
     if (!container) return;
 
     try {
-
         const redacoes = await api(
-            "minhas_correcoes_professor"
+            'minhas_correcoes_professor'
         );
 
         if (contador) {
@@ -1871,7 +2160,6 @@ async function carregarHistoricoProfessor() {
         }
 
         if (redacoes.length === 0) {
-
             container.innerHTML = `
                 <div class="professor-historico-vazio">
                     <span>📚</span>
@@ -1882,18 +2170,15 @@ async function carregarHistoricoProfessor() {
                     </p>
                 </div>
             `;
-
             return;
         }
 
         container.innerHTML = redacoes.map(redacao => {
-
             const data = redacao.data_correcao
                 ? new Date(
-                    String(redacao.data_correcao)
-                        .replace(" ", "T")
-                  ).toLocaleDateString("pt-BR")
-                : "Data não disponível";
+                    String(redacao.data_correcao).replace(' ', 'T')
+                ).toLocaleDateString('pt-BR')
+                : 'Data não disponível';
 
             return `
                 <article class="professor-historico-card">
@@ -1943,25 +2228,69 @@ async function carregarHistoricoProfessor() {
 
                 </article>
             `;
-
-        }).join("");
+        }).join('');
 
     } catch (erro) {
-
-        console.error(
-            "Erro ao carregar histórico:",
-            erro
-        );
+        console.error('Erro ao carregar histórico:', erro);
 
         container.innerHTML = `
             <div class="professor-historico-vazio">
                 <p>
-                    Não foi possível carregar
-                    suas correções.
+                    Não foi possível carregar suas correções.
                 </p>
             </div>
         `;
-
     }
 }
 
+async function concluirAtividadeBrio(id) {
+    try {
+        await api('concluir_tarefa', {
+            method: 'POST',
+            body: JSON.stringify({ id: Number(id) })
+        });
+
+        await atualizarAtividadesBrio();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Erro ao concluir: ' + erro.message);
+    }
+}
+
+async function excluirAtividadeBrio(id) {
+    const confirmou = confirm(
+        'Deseja excluir esta atividade permanentemente?'
+    );
+
+    if (!confirmou) return;
+
+    try {
+        await api('excluir_tarefa', {
+            method: 'POST',
+            body: JSON.stringify({ id: Number(id) })
+        });
+
+        await atualizarAtividadesBrio();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Erro ao excluir: ' + erro.message);
+    }
+}
+
+async function atualizarAtividadesBrio() {
+    if (
+        document.getElementById('tarefas') &&
+        typeof window.atualizarListaCalendario === 'function'
+    ) {
+        await window.atualizarListaCalendario();
+    }
+
+    if (
+        document.getElementById('rotina') &&
+        typeof carregarRotinaDashboard === 'function'
+    ) {
+        await carregarRotinaDashboard();
+    }
+}

@@ -1,35 +1,116 @@
+
 <!doctype html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Login — BRIO</title>
+
     <link rel="stylesheet" href="css/style.css?v=20261104">
+
     <link rel="icon" type="image/png" href="img/logo.png">
-<link rel="shortcut icon" type="image/png" href="img/logo.png">
+    <link rel="shortcut icon" type="image/png" href="img/logo.png">
 </head>
 
 <body>
+
     <header></header>
+
     <main class="container">
+
         <form class="form" onsubmit="entrar(event)">
+
             <span class="badge">
                 ÁREA DO ALUNO
             </span>
-            <h1>Entrar</h1>
-            <p class="muted">Continue sua jornada de estudos.</p>
-            <div id="msg" class="msg"></div>
-            <div class="field"><label>E-mail</label><input id="email" type="email" required></div>
-            <div class="field"><label>Senha</label><input id="senha" type="password" required></div>
-            <button class="btn">Entrar</button>
-            <p>Não possui conta? <a href="cadastro.html"><b>Cadastre-se</b></a></p>
-        </form>
-    </main>
-    <script src="js/app.js?v=20261103"></script>
-    <script>
-        async function entrar(e) { e.preventDefault(); try { const d = await api('login', { method: 'POST', body: JSON.stringify({ email: email.value, senha: senha.value }) }); location.href = d.usuario.tipo === 'professor' ? 'professor.html' : 'dashboard.html' } catch (err) { setMsg('msg', err.message) } }
-    </script>
-</body>
 
+            <h1>Entrar</h1>
+
+            <p class="muted">
+                Continue sua jornada de estudos.
+            </p>
+
+            <div id="msg" class="msg"></div>
+
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input id="email" type="email" required>
+            </div>
+
+            <div class="field">
+                <label for="senha">Senha</label>
+                <input id="senha" type="password" required>
+            </div>
+
+            <button class="btn" type="submit">
+                Entrar
+            </button>
+
+            <p>
+                Não possui conta?
+                <a href="cadastro.html">
+                    <b>Cadastre-se</b>
+                </a>
+            </p>
+
+        </form>
+
+    </main>
+
+    <!-- Carrega as funções do BRIO -->
+    <script src="js/app.js?v=20261110b"></script>
+
+    <!-- Função responsável pelo login -->
+    <script>
+        async function entrar(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+
+            const botao = document.querySelector(
+                'button[type="submit"]'
+            );
+
+            botao.disabled = true;
+            botao.textContent = 'Entrando...';
+
+            try {
+                const dados = await api('login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: email,
+                        senha: senha
+                    })
+                });
+
+                if (!dados.usuario) {
+                    throw new Error(
+                        'Não foi possível identificar o usuário.'
+                    );
+                }
+
+                if (dados.usuario.tipo === 'professor') {
+                    window.location.href = 'professor.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+
+            } catch (erro) {
+                console.error('Erro no login:', erro);
+
+                setMsg(
+                    'msg',
+                    erro.message || 'Não foi possível entrar.'
+                );
+
+                botao.disabled = false;
+                botao.textContent = 'Entrar';
+            }
+        }
+    </script>
+
+</body>
 </html>

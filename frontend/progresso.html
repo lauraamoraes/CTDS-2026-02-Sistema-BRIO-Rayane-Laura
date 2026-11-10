@@ -544,7 +544,7 @@
             </div>
 
             <img
-    src="img/mascote-nivel1.png"
+    src="img/nivel1.png"
     alt="Mascote do BRIO"
     class="mascote-progresso mascote-por-nivel"
 >
@@ -874,8 +874,8 @@
 
     </main>
 
-    <script src="js/app.js?v=20261103"></script>
-    <script>
+<script src="js/app.js?v=20261110b"></script>
+<script>
 
         // ==========================================
         // CARREGAR DADOS REAIS DO ALUNO
@@ -890,12 +890,12 @@
             try {
 
                 const resposta = await fetch(
-                    "../backend/api.php?action=progresso_dados",
-                    {
-                        method: "GET",
-                        credentials: "same-origin"
-                    }
-                );
+    "../backend/api.php?action=progresso_dados",
+    {
+        method: "GET",
+        credentials: "same-origin"
+    }
+);
 
 
                 const dados = await resposta.json();

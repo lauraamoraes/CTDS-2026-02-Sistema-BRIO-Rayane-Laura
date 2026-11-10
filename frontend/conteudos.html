@@ -261,8 +261,7 @@
         
     </main>
 
-    <script src="js/app.js?v=20261103"></script>
-
+<script src="js/app.js?v=20261110b"></script>
     <script>
         const MATERIAS_PAGINA = [
             {
@@ -466,26 +465,28 @@
                 aliases.includes(normalizar(item.materia))
             );
 
-            if (!conteudos.length) {
-                lista.innerHTML = `
-                    <div class="empty">
-                        <h3>Nenhum conteúdo cadastrado</h3>
+            
+if (!conteudos.length) {
+    lista.innerHTML = `
+        <div class="empty">
+            <h3>Nenhum conteúdo cadastrado</h3>
 
-                        <p>
-                            Não há tópicos cadastrados para
-                            ${materiaAtual}.
-                        </p>
+            <p>
+                Não há tópicos cadastrados para
+                ${esc(materiaAtual)}.
+            </p>
 
-                        <p>
-                            Os conteúdos precisam ser inseridos na tabela
-                            <code>conteudos</code> do banco de dados
-                            para ficarem disponíveis a todos os alunos.
-                        </p>
-                    </div>
-                `;
+            <p>
+                Os conteúdos precisam ser inseridos na tabela
+                <code>conteudos</code> do banco de dados
+                para ficarem disponíveis a todos os alunos.
+            </p>
+        </div>
+    `;
 
-                return;
-            }
+    return;
+}
+
 
             lista.innerHTML = conteudos.map(c => `
                 <article class="card">

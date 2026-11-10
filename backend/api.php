@@ -7,6 +7,29 @@ require_once __DIR__ . '/config/auth.php';
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
+
+function usuarioTemPlanoPago($pdo, $uid): bool
+{
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM usuarios u
+        INNER JOIN planos p
+            ON p.id = u.plano_atual_id
+        INNER JOIN assinaturas a
+            ON a.usuario_id = u.id
+            AND a.plano_id = p.id
+        WHERE u.id = ?
+          AND p.valor_mensal > 0
+          AND a.status = 'ativa'
+          AND a.inicio <= CURDATE()
+          AND a.fim >= CURDATE()
+    ");
+
+    $stmt->execute([$uid]);
+
+    return (int)$stmt->fetchColumn() > 0;
+}
+
 function requirePlanoPago($pdo, $uid)
 {
     $stmt = $pdo->prepare(
@@ -901,9 +924,12 @@ jsonResponse([
         ========================= */
 
         
+
 case 'simulados':
 
-    requireLogin();
+    $uid = requireLogin();
+
+    $planoPago = usuarioTemPlanoPago($pdo, $uid);
 
     $sql = "
         SELECT
@@ -918,9 +944,14 @@ case 'simulados':
 
         LEFT JOIN questoes q
             ON q.simulado_id = s.id
+    ";
 
+    if (!$planoPago) {
+        $sql .= " WHERE s.gratuito = 1 ";
+    }
+
+    $sql .= "
         GROUP BY s.id
-
         ORDER BY s.id DESC
     ";
 
@@ -929,6 +960,7 @@ case 'simulados':
     jsonResponse($resultado->fetchAll());
 
     break;
+
 
 
         /* =========================
@@ -1904,9 +1936,116 @@ case 'corrigir_redacao':
             break;
 
 
+case 'editar_tarefa':
+
+    $uid = requireLogin();
+    requirePlanoPago($pdo, $uid);
+
+    if ($method !== 'POST') {
+        jsonResponse(['erro' => 'Método inválido.'], 405);
+    }
+
+    $d = body();
+
+    $id = (int)($d['id'] ?? 0);
+    $titulo = trim($d['titulo'] ?? '');
+    $descricao = trim($d['descricao'] ?? '');
+    $data = $d['data'] ?? '';
+    $horario = $d['horario'] ?: null;
+    $duracao = (int)($d['duracao'] ?? 50);
+    $tipo = $d['tipo'] ?? 'estudo';
+
+    $dataValida = DateTime::createFromFormat('!Y-m-d', $data);
+
+    if (
+        $id <= 0 ||
+        $titulo === '' ||
+        !$dataValida ||
+        $dataValida->format('Y-m-d') !== $data ||
+        $duracao <= 0 ||
+        !in_array($tipo, ['estudo', 'simulado', 'redacao', 'outro'], true)
+    ) {
+        jsonResponse(['erro' => 'Dados inválidos.'], 422);
+    }
+
+    if ($horario !== null &&
+        !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $horario)) {
+        jsonResponse(['erro' => 'Horário inválido.'], 422);
+    }
+
+    $stmt = $pdo->prepare("
+        UPDATE tarefas
+        SET titulo = ?,
+            descricao = ?,
+            data = ?,
+            horario = ?,
+            duracao = ?,
+            tipo = ?
+        WHERE id = ?
+          AND usuario_id = ?
+    ");
+
+    $stmt->execute([
+        $titulo,
+        $descricao,
+        $data,
+        $horario,
+        $duracao,
+        $tipo,
+        $id,
+        $uid
+    ]);
+
+    jsonResponse([
+        'ok' => true,
+        'mensagem' => 'Atividade atualizada com sucesso!'
+    ]);
+
+    break;
+
         /* =========================
            CONCLUIR TAREFA
         ========================= */
+
+case 'excluir_tarefa':
+
+    $uid = requireLogin();
+
+    if ($method !== 'POST') {
+        jsonResponse([
+            'erro' => 'Método não permitido.'
+        ], 405);
+    }
+
+    $dados = body();
+    $id = (int)($dados['id'] ?? 0);
+
+    if ($id <= 0) {
+        jsonResponse([
+            'erro' => 'Atividade inválida.'
+        ], 422);
+    }
+
+    $stmt = $pdo->prepare("
+        DELETE FROM tarefas
+        WHERE id = ?
+        AND usuario_id = ?
+    ");
+
+    $stmt->execute([$id, $uid]);
+
+    if ($stmt->rowCount() === 0) {
+        jsonResponse([
+            'erro' => 'Atividade não encontrada.'
+        ], 404);
+    }
+
+    jsonResponse([
+        'ok' => true,
+        'mensagem' => 'Atividade excluída.'
+    ]);
+
+    break;
 
         case 'concluir_tarefa':
 
@@ -2197,6 +2336,64 @@ case 'corrigir_redacao':
         /* =========================
            PERFIL
         ========================= */
+
+        
+case 'editar_perfil':
+
+    $uid = requireLogin();
+
+    if ($method !== 'POST') {
+        jsonResponse(['erro' => 'Método inválido.'], 405);
+    }
+
+    $d = body();
+
+    $nome = trim($d['nome'] ?? '');
+    $email = trim($d['email'] ?? '');
+    $objetivo = trim($d['objetivo'] ?? '');
+
+    if (
+        mb_strlen($nome) < 3 ||
+        mb_strlen($nome) > 150 ||
+        !filter_var($email, FILTER_VALIDATE_EMAIL) ||
+        mb_strlen($email) > 190 ||
+        mb_strlen($objetivo) > 255
+    ) {
+        jsonResponse([
+            'erro' => 'Verifique o nome, e-mail e objetivo.'
+        ], 422);
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT id FROM usuarios
+         WHERE email = ? AND id <> ?
+         LIMIT 1"
+    );
+
+    $stmt->execute([$email, $uid]);
+
+    if ($stmt->fetch()) {
+        jsonResponse([
+            'erro' => 'Este e-mail já está sendo utilizado.'
+        ], 409);
+    }
+
+    $stmt = $pdo->prepare(
+        "UPDATE usuarios
+         SET nome = ?, email = ?, objetivo = ?
+         WHERE id = ?"
+    );
+
+    $stmt->execute([$nome, $email, $objetivo, $uid]);
+
+    $_SESSION['usuario_nome'] = $nome;
+
+    jsonResponse([
+        'ok' => true,
+        'mensagem' => 'Informações atualizadas com sucesso!'
+    ]);
+
+    break;
 
         case 'perfil':
 
